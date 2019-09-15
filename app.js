@@ -16,9 +16,9 @@ let field = [
   0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,2,
   0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,2,
   0,0,0,0,0,0,2,2,2,2
 ];
 
@@ -41,8 +41,8 @@ function updateBlocks(parts,count) {
 }
 
 function updateField() {
-  BLOCKS.A.forEach((e,i) => {
-    field[BLOCKS.A[i]] = 1;
+  BLOCKS.C.forEach((e,i) => {
+    field[BLOCKS.C[i]] = 1;
   });
 }
 
@@ -58,43 +58,50 @@ function clearCanvas() {
   ctx.clearRect(0, 0, 300, 420);
 }
 
-function sideMovable() {
-  BLOCKS.A.forEach((e,i) => {
-    if(BLOCKS.A[i].toFixed().substr(-1, 1) === (ROW+1).toFixed().substr(-1, 1)) {
-      console.log('left failed');
-      left = false;
-    } else if(BLOCKS.A[i].toFixed().substr(-1, 1) === ROW.toFixed()) {
-      console.log('right failed');
-      right = false;
-    }
-  });
-}
-
 function blockMovable() {
+  left = true;
+  right = true;
+  down = true;
+
   field.forEach((e,i) => {
-    if(field[i] === 1 && BLOCKS.A[0] === ( i+1) ) {
-      console.log('left failed');
-      left = false;
-    } else if (field[i] === 1 && BLOCKS.A[3] === ( i-1) ) {
-      console.log('right failed');
-      right = false;
-    } else if (field[i] === 1 && BLOCKS.A[3] === ( i-10) ) {
-      console.log('down failed');
-      down = false;
+    if(field[i] === 2) {
+      BLOCKS.C.forEach((d,j) => {
+        console.log(field[i-10]);
+        
+        if(BLOCKS.C[j] === ( i+1)) {
+          console.log('left failed');
+          left = false;
+        } else if(BLOCKS.C[j] === ( i-1)) {
+          console.log('right failed');
+          right = false;
+        } else if(field[i-10] === 1) {
+          console.log('down failed');
+          down = false;
+        }
+      })
     }
   });
-}
 
-function downMovable() {
-  const lastRow = field.length - ROW;
-  BLOCKS.A.forEach((e,i) => {
-    let isLastRow = field.some(v => BLOCKS.A[i] >= lastRow);
+  
+  BLOCKS.C.forEach((e,i) => {
+    // check last row
+    let isLastRow = field.some(v => BLOCKS.C[i] >= field.length - ROW);
     if(isLastRow) {
       console.log('down failed');
       down = false;
     }
+
+    // check left/right walls
+    if(BLOCKS.C[i].toFixed().substr(-1, 1) === (ROW+1).toFixed().substr(-1, 1)) {
+      console.log('left failed');
+      left = false;
+    } else if(BLOCKS.C[i].toFixed().substr(-1, 1) === ROW.toFixed()) {
+      console.log('right failed');
+      right = false;
+    }
   })
 }
+
 
 function draw() {
   if (canvas.getContext) {
@@ -103,15 +110,15 @@ function draw() {
     ctx.stroke(outline);
     let rectangle = new Path2D();
     
-    for(let i = 0; i < field.length; i++){
+    field.forEach((e,i)=>{
       if(field[i] === 1) {
-          rectangle.rect((i.toFixed().substr(-1, 1))*30, Math.floor(i/10)*30, 30, 30);
-          ctx.fill(rectangle);
+        rectangle.rect((i.toFixed().substr(-1, 1))*30, Math.floor(i/10)*30, 30, 30);
+        ctx.fill(rectangle);
       } else if (field[i] === 2) {
         rectangle.rect((i.toFixed().substr(-1, 1))*30, Math.floor(i/10)*30, 30, 30);
         ctx.fill(rectangle);
       } 
-    }
+    })
     
   }
 }
@@ -120,32 +127,30 @@ window.addEventListener('keydown', event => {
   // down direction
   if (event.isComposing || event.keyCode === 40 && down) {   
     console.log('down')
-    updateBlocks(BLOCKS.A,10);
+    updateBlocks(BLOCKS.C,10);
     clearField();
     clearCanvas();
     updateField();
     draw();
-    downMovable();
+    blockMovable();
   // left direction
   } else if (event.isComposing || event.keyCode === 37 && left) {
     console.log('left')
-    updateBlocks(BLOCKS.A,-1);
+    updateBlocks(BLOCKS.C,-1);
     clearField();
     clearCanvas();
     updateField();
     draw();
-    sideMovable();
-    right = true;
+    blockMovable();
   // right direction
   } else if (event.isComposing || event.keyCode === 39 && right) {
     console.log('right');
-    updateBlocks(BLOCKS.A,1);
+    updateBlocks(BLOCKS.C,1);
     clearField();
     clearCanvas();
     updateField();
     draw();
-    sideMovable();
-    left = true;
+    blockMovable();
   }
 });
 
