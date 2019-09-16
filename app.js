@@ -4,10 +4,16 @@ let left = true;
 let right = true;
 let down = true;
 let stop = false;
-let isGather = false;
+let isComplete = false;
 const ROW = 9;
 const COLUMN = 14;
 
+/**
+ * Array
+ * @param {number} 0 - clear areas
+ * @param {number} 1 - movable block area
+ * @param {number} 2 - fixed block area
+ */
 let field = [
   0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,
@@ -15,13 +21,13 @@ let field = [
   0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,2,
-  2,2,2,0,0,0,2,2,2,0,
-  2,2,2,0,0,0,2,2,2,2,
+  2,0,0,0,0,0,0,0,0,0,
+  2,0,0,0,0,0,0,0,0,0,
+  2,0,0,0,0,0,0,0,0,0,
+  2,0,0,0,0,0,0,0,0,0,
+  2,0,0,0,0,0,0,0,0,2,
+  2,2,2,2,2,2,0,0,0,2,
+  0,2,2,0,0,0,2,0,2,2,
   2,2,2,2,0,2,2,2,2,2
 ];
 
@@ -66,6 +72,7 @@ function blockMovable() {
   right = true;
   down = true;
 
+  // check movable around block
   field.forEach((e,i) => {
     if(e === 2) {
       BLOCKS.C.forEach((d,j) => {
@@ -107,9 +114,9 @@ function blockMovable() {
 
 function isBlocksGathersInRow() {
   if(left === false && right === false && down === false) {
-    isGather = true;
+    isComplete = true;
 
-    let oneRowArray = [];
+    let oneRowArray = []; // creat Array on each rows
     let start = 0;
     let end = ROW+1;
     for(let i = 0; i < COLUMN; i++){
@@ -119,24 +126,41 @@ function isBlocksGathersInRow() {
       end += ROW+1;
     }
 
-    let gatheredRowArray = [];
+    let completeRowArray = []; // should delete areas
+    let completeRowNumbers = []; // row number
     oneRowArray.forEach((e,i)=>{
       const isIncludeZero = e.every(item => item !== 0);
       if(isIncludeZero) {
+        completeRowNumbers.push(i)
         for(let j = 0; j < ROW+1; j++){
-          gatheredRowArray.push(i*(ROW+1)+j);
+          completeRowArray.push(i*(ROW+1)+j);
         }
       }
     })
-    
-    gatheredRowArray.forEach((e,i)=>{
+
+    // delete complete rows
+    completeRowArray.forEach((e,i)=>{
       field[e] = 0;
     })
-
     clearCanvas();
-    
     draw();
+
+    // move blocks
+    field.forEach((e,i) => {
+      if (i < completeRowNumbers[0]*(ROW+1)) {        
+        if(e === 1 || e === 2) {
+          field[i] = 0;
+          field[i+(completeRowNumbers.length*(ROW+1))] = 2;
+        }
+      }
+    });
+
+    console.log(field);
     
+
+    setTimeout(clearCanvas, 1500);
+    setTimeout(draw, 1500);
+
     
   }
 }
