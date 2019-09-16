@@ -3,7 +3,10 @@ const ctx = canvas.getContext('2d');
 let left = true;
 let right = true;
 let down = true;
+let stop = false;
+let isGather = false;
 const ROW = 9;
+const COLUMN = 14;
 
 let field = [
   0,0,0,0,0,0,0,0,0,0,
@@ -17,9 +20,9 @@ let field = [
   0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,2,
-  0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,2,
-  0,0,0,0,0,0,2,2,2,2
+  2,2,2,0,0,0,2,2,2,0,
+  2,2,2,0,0,0,2,2,2,2,
+  2,2,2,2,0,2,2,2,2,2
 ];
 
 let a = 4;
@@ -48,7 +51,7 @@ function updateField() {
 
 function clearField() {
   field.forEach((e,i) => {
-    if (field[i] !== 2) {
+    if (e !== 2) {
       field[i] = 0;
     }
   });
@@ -64,14 +67,12 @@ function blockMovable() {
   down = true;
 
   field.forEach((e,i) => {
-    if(field[i] === 2) {
+    if(e === 2) {
       BLOCKS.C.forEach((d,j) => {
-        console.log(field[i-10]);
-        
-        if(BLOCKS.C[j] === ( i+1)) {
+        if(BLOCKS.C[j] === (i+1)) {
           console.log('left failed');
           left = false;
-        } else if(BLOCKS.C[j] === ( i-1)) {
+        } else if(BLOCKS.C[j] === (i-1)) {
           console.log('right failed');
           right = false;
         } else if(field[i-10] === 1) {
@@ -100,6 +101,44 @@ function blockMovable() {
       right = false;
     }
   })
+  
+}
+
+
+function isBlocksGathersInRow() {
+  if(left === false && right === false && down === false) {
+    isGather = true;
+
+    let oneRowArray = [];
+    let start = 0;
+    let end = ROW+1;
+    for(let i = 0; i < COLUMN; i++){
+      let oneROW = field.slice(start,end);
+      oneRowArray.push(oneROW);
+      start += ROW+1;
+      end += ROW+1;
+    }
+
+    let gatheredRowArray = [];
+    oneRowArray.forEach((e,i)=>{
+      const isIncludeZero = e.every(item => item !== 0);
+      if(isIncludeZero) {
+        for(let j = 0; j < ROW+1; j++){
+          gatheredRowArray.push(i*(ROW+1)+j);
+        }
+      }
+    })
+    
+    gatheredRowArray.forEach((e,i)=>{
+      field[e] = 0;
+    })
+
+    clearCanvas();
+    
+    draw();
+    
+    
+  }
 }
 
 
@@ -111,10 +150,10 @@ function draw() {
     let rectangle = new Path2D();
     
     field.forEach((e,i)=>{
-      if(field[i] === 1) {
+      if(e === 1) {
         rectangle.rect((i.toFixed().substr(-1, 1))*30, Math.floor(i/10)*30, 30, 30);
         ctx.fill(rectangle);
-      } else if (field[i] === 2) {
+      } else if (e === 2) {
         rectangle.rect((i.toFixed().substr(-1, 1))*30, Math.floor(i/10)*30, 30, 30);
         ctx.fill(rectangle);
       } 
@@ -133,6 +172,7 @@ window.addEventListener('keydown', event => {
     updateField();
     draw();
     blockMovable();
+    isBlocksGathersInRow();
   // left direction
   } else if (event.isComposing || event.keyCode === 37 && left) {
     console.log('left')
@@ -142,6 +182,7 @@ window.addEventListener('keydown', event => {
     updateField();
     draw();
     blockMovable();
+    isBlocksGathersInRow();
   // right direction
   } else if (event.isComposing || event.keyCode === 39 && right) {
     console.log('right');
@@ -151,7 +192,9 @@ window.addEventListener('keydown', event => {
     updateField();
     draw();
     blockMovable();
+    isBlocksGathersInRow();
   }
+  
 });
 
 
