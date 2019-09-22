@@ -1,5 +1,7 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+let nowBlock = 0;
+let howManyFall = 0;
 let left = true;
 let right = true;
 let down = true;
@@ -11,7 +13,7 @@ const COLUMN = 14;
 /**
  * Array
  * @param {number} 0 - clear areas
- * @param {number} 1 - movable block area
+ * @param {number} 1 - moving block area
  * @param {number} 2 - fixed block area
  */
 let field = [
@@ -21,27 +23,53 @@ let field = [
   0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,
-  2,0,0,0,0,0,0,0,0,0,
-  2,0,0,0,0,0,0,0,0,0,
-  2,0,0,0,0,0,0,0,0,0,
-  2,0,0,0,0,0,0,0,0,0,
-  2,0,0,0,0,0,0,0,0,2,
-  2,2,2,2,2,2,0,0,0,2,
-  0,2,2,0,0,0,2,0,2,2,
-  2,2,2,2,0,2,2,2,2,2
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0,0,0
 ];
 
 let a = 4;
 
-let BLOCKS = {
-  A : [a,a+1,a+ROW+1,a+ROW+2],
-  B : [a,a+1,a+2,a+3],
-  C : [a,a+1,a+2,a+ROW+2],
-  D : [a,a+1,a+2,a+ROW+1],
-  E : [a,a+1,a+2,a+ROW+3],
-  F : [a,a+1,a+ROW,a+ROW+1],
-  G : [a-1,a,a+ROW+1,a+ROW+2]
-};
+let BLOCKS = [
+  {
+    number: [a,a+1,a+ROW+1,a+ROW+2],
+    color: 'red',
+  },
+  {
+    number: [a,a+1,a+2,a+3],
+    color: 'blue',
+  },
+  {
+    number: [a,a+1,a+2,a+ROW+2],
+    color: 'green',
+  },
+  {
+    number: [a,a+1,a+2,a+ROW+1],
+    color: 'yellow',
+  },
+  {
+    number: [a,a+1,a+2,a+ROW+3],
+    color: 'orange',
+  },
+  {
+    number: [a,a+1,a+ROW,a+ROW+1],
+    color: 'purple',
+  },
+  {
+    number: [a-1,a,a+ROW+1,a+ROW+2],
+    color: 'gray',
+  },
+];
+
+function createNewBlock() {
+  return nowBlock = Math.floor( Math.random() * BLOCKS.length );
+}
+
 
 function updateBlocks(parts,count) {
   for(let i = 0; i < parts.length; i++){
@@ -50,9 +78,7 @@ function updateBlocks(parts,count) {
 }
 
 function updateField() {
-  BLOCKS.C.forEach((e,i) => {
-    field[BLOCKS.C[i]] = 1;
-  });
+  BLOCKS[nowBlock].number.forEach((e,i) => {field[BLOCKS[nowBlock].number[i]] = 1;});
 }
 
 function clearField() {
@@ -75,14 +101,14 @@ function blockMovable() {
   // check movable around block
   field.forEach((e,i) => {
     if(e === 2) {
-      BLOCKS.C.forEach((d,j) => {
-        if(BLOCKS.C[j] === (i+1)) {
+      BLOCKS[nowBlock].number.forEach((d,j) => {
+        if(BLOCKS[nowBlock].number[j] === (i+1)) {
           console.log('left failed');
           left = false;
-        } else if(BLOCKS.C[j] === (i-1)) {
+        } else if(BLOCKS[nowBlock].number[j] === (i-1)) {
           console.log('right failed');
           right = false;
-        } else if(field[i-10] === 1) {
+        } else if(field[i-(ROW+1)] === 1) {
           console.log('down failed');
           down = false;
         }
@@ -91,19 +117,19 @@ function blockMovable() {
   });
 
   
-  BLOCKS.C.forEach((e,i) => {
+  BLOCKS[nowBlock].number.forEach((e,i) => {
     // check last row
-    let isLastRow = field.some(v => BLOCKS.C[i] >= field.length - ROW);
+    let isLastRow = field.some(v => BLOCKS[nowBlock].number[i] >= field.length - ROW);
     if(isLastRow) {
       console.log('down failed');
       down = false;
     }
 
-    // check left/right walls
-    if(BLOCKS.C[i].toFixed().substr(-1, 1) === (ROW+1).toFixed().substr(-1, 1)) {
+    // check left/right walls if its number of the first digit is 0(left)/9(right)
+    if(BLOCKS[nowBlock].number[i].toFixed().substr(-1, 1) === (ROW+1).toFixed().substr(-1, 1)) {
       console.log('left failed');
       left = false;
-    } else if(BLOCKS.C[i].toFixed().substr(-1, 1) === ROW.toFixed()) {
+    } else if(BLOCKS[nowBlock].number[i].toFixed().substr(-1, 1) === ROW.toFixed()) {
       console.log('right failed');
       right = false;
     }
@@ -127,8 +153,9 @@ function isBlocksGathersInRow() {
     }
 
     let completeRowArray = []; // should delete areas
-    let completeRowNumbers = []; // row number
+    let completeRowNumbers = []; // row numbers
     oneRowArray.forEach((e,i)=>{
+      // skip if the row include 0
       const isIncludeZero = e.every(item => item !== 0);
       if(isIncludeZero) {
         completeRowNumbers.push(i)
@@ -139,29 +166,47 @@ function isBlocksGathersInRow() {
     })
 
     // delete complete rows
-    completeRowArray.forEach((e,i)=>{
-      field[e] = 0;
-    })
+    completeRowArray.forEach((e,i)=>{ field[e] = 0; })
     clearCanvas();
     draw();
 
-    // move blocks
-    field.forEach((e,i) => {
-      if (i < completeRowNumbers[0]*(ROW+1)) {        
+    // move blocks as the amount of deleted rows
+    const lowerBlocks = field.map((e,i)=>{
+      if (i <= completeRowNumbers[0]*(ROW+1)) {
         if(e === 1 || e === 2) {
           field[i] = 0;
-          field[i+(completeRowNumbers.length*(ROW+1))] = 2;
+          return i+((completeRowNumbers.length)*(ROW+1));
         }
       }
+    })
+    lowerBlocks.forEach((e,i) => {
+      field[e] = 2;
     });
-
-    console.log(field);
-    
 
     setTimeout(clearCanvas, 1500);
     setTimeout(draw, 1500);
 
+
+    // let c = [95,103,104,105];
+    // let ee = [];
+    // field.forEach((e,i) => {
+    //   if(e === 0) {
+    //     c.forEach((d,j) => {
+    //       if(field[i-(ROW+1)] === 2) {
+    //         field[d] = 0;
+    //         ee.push(d+(ROW+1));
+    //       }
+    //     })
+    //   }
+    // })
     
+    // ee.forEach((e,i) => {
+    //   field[e] = 2;
+    // });
+
+    // setTimeout(clearCanvas, 1500);
+    // setTimeout(draw, 1500);
+
   }
 }
 
@@ -171,15 +216,16 @@ function draw() {
     let outline = new Path2D();
     outline.rect(0, 0, 300, 420);
     ctx.stroke(outline);
-    let rectangle = new Path2D();
     
     field.forEach((e,i)=>{
       if(e === 1) {
-        rectangle.rect((i.toFixed().substr(-1, 1))*30, Math.floor(i/10)*30, 30, 30);
-        ctx.fill(rectangle);
+        ctx.fillStyle =　BLOCKS[nowBlock].color;
+        ctx.fillRect((i.toFixed().substr(-1, 1))*30, Math.floor(i/10)*30, 30, 30);
+        ctx.fill();
       } else if (e === 2) {
-        rectangle.rect((i.toFixed().substr(-1, 1))*30, Math.floor(i/10)*30, 30, 30);
-        ctx.fill(rectangle);
+        ctx.fillStyle =　'black';
+        ctx.fillRect((i.toFixed().substr(-1, 1))*30, Math.floor(i/10)*30, 30, 30);
+        ctx.fill();
       } 
     })
     
@@ -190,7 +236,7 @@ window.addEventListener('keydown', event => {
   // down direction
   if (event.isComposing || event.keyCode === 40 && down) {   
     console.log('down')
-    updateBlocks(BLOCKS.C,10);
+    updateBlocks(BLOCKS[nowBlock].number,10);
     clearField();
     clearCanvas();
     updateField();
@@ -200,7 +246,7 @@ window.addEventListener('keydown', event => {
   // left direction
   } else if (event.isComposing || event.keyCode === 37 && left) {
     console.log('left')
-    updateBlocks(BLOCKS.C,-1);
+    updateBlocks(BLOCKS[nowBlock].number,-1);
     clearField();
     clearCanvas();
     updateField();
@@ -210,7 +256,7 @@ window.addEventListener('keydown', event => {
   // right direction
   } else if (event.isComposing || event.keyCode === 39 && right) {
     console.log('right');
-    updateBlocks(BLOCKS.C,1);
+    updateBlocks(BLOCKS[nowBlock].number,1);
     clearField();
     clearCanvas();
     updateField();
@@ -223,9 +269,9 @@ window.addEventListener('keydown', event => {
 
 
 window.addEventListener('load',()=>{
+  createNewBlock();
   updateField();
   draw();
   blockMovable();
 })
-
 
