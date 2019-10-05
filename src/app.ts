@@ -16,23 +16,23 @@ const COLUMN = 14;
 /**
  * Array
  */
-let field: Array< string | number> = [
-  'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-  'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-  'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-  'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-  'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-  'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-  'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-  'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-  'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-  'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-  'empty','empty','empty','empty','empty','empty','empty',1,'empty','empty',
-  'empty','empty','empty','empty','empty','empty','empty',1,'empty','empty',
-  0,0,'empty','empty','empty','empty','empty',1,0,0,
-  0,0,1,1,1,1,'empty',1,0,0
-];
-//let field = [...Array(COLUMN*ROW)].map(v => v = 'empty');
+// let field: Array< string | number> = [
+//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+//   'empty','empty','empty','empty','empty','empty','empty',1,'empty','empty',
+//   'empty','empty','empty','empty','empty','empty','empty',1,'empty','empty',
+//   0,0,'empty','empty','empty','empty','empty',1,0,0,
+//   0,0,1,1,1,1,'empty',1,0,0
+// ];
+let field: Array< string | number> = [...Array(COLUMN*ROW)].map(v => v = 'empty');
 
 
 const a = 4;
@@ -96,7 +96,7 @@ function updateBlocks(parts: Array<number>,direction: string) {
 }
 
 function fixToFirstDigit(digit: number) {
-  return parseInt(digit.toFixed().substr(-1, 1));
+  return Number(digit.toFixed().substr(-1, 1));
 }
 
 function resetBlocks() {
@@ -181,6 +181,12 @@ function rotateAngle() {
   if(angle === 360) {
     angle = 0;
   }
+}
+
+function angleToRadians(num: number) {
+	let radians = 1.57;
+	radians += (Math.PI / 180) * (num);
+	return Number(radians.toFixed(2));
 }
 
 
@@ -388,16 +394,17 @@ function filterUndef<T>(ts: (T | undefined)[]): T[] {
 function isBlocksGathersInRow() {
   if(left === false && right === false && down === false) {
     isComplete = true;
-
+		
+		// creat Array on each rows
     let start = 0;
-    let end = ROW;
+		let end = ROW;
     const oneRowArray = [...Array(COLUMN)].map(()=>{
-      let oneROW = field.slice(start,end);
+			let oneROW = field.slice(start,end);
       start += ROW;
       end += ROW;
       return oneROW;
-    })
-
+		})
+		
     let completeRowArray: Array<number> = []; // should delete areas
     let completeRowNumbers: Array<number> = []; // row numbers
     oneRowArray.forEach((v,i)=>{
@@ -412,9 +419,10 @@ function isBlocksGathersInRow() {
         })
       }
     })
-
+		
     // delete complete rows
-    completeRowArray.forEach((v)=> field[v] = 'empty')
+		completeRowArray.forEach((v)=> field[v] = 'empty');
+		
     clearCanvas();
     draw();
 
@@ -537,30 +545,32 @@ window.addEventListener('keydown', event => {
   
   blockMovable();
   
-  controllableBlocksNumber();
+	controllableBlocksNumber();
+	
+	isBlocksGathersInRow();
   
-  // if(down === false) {
-  //   console.log('check');
-    
-  //   resetBlocks();
-  //   field.forEach((v,i)=>{
-  //     if(v === 'current') {
-  //       field[i] = controllableBlock;
-  //     }
-  //   })
-  //   controllableBlocksNumber();
-  //   clearField();
-  //   clearCanvas();
-  //   createNewBlock();
-  //   updateField();
-  //   controllableBlocksNumber();
-  //   draw();
-  //   down = true;
-  //}
-  console.log(angle);
-  console.log(nowBlocks);
-  
-  isBlocksGathersInRow();
+ if(down === false) {
+   console.log('check');
+  angle = 0;
+   resetBlocks();
+   field.forEach((v,i)=>{
+     if(v === 'current') {
+       field[i] = controllableBlock;
+     }
+   })
+   controllableBlocksNumber();
+   clearField();
+   clearCanvas();
+   createNewBlock();
+	 updateField(copyBLOCKS[controllableBlock].number);
+	 controllableBlocksNumber();
+	 draw();
+	 down = true;
+  }
+  // console.log(angle);
+	// console.log(nowBlocks);
+	// console.log(field);
+	
 });
 
 
@@ -571,3 +581,4 @@ window.addEventListener('load',()=>{
   controllableBlocksNumber();
   blockMovable();
 })
+
