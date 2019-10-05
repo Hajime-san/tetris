@@ -1,6 +1,7 @@
 const canvas = document.getElementById('canvas').getContext('2d');
 let controllableBlock = 0;
 let nowBlocks = [];
+let tmpBlocks = [];
 let howManyFall = 0;
 let left = true;
 let right = true;
@@ -33,7 +34,8 @@ let field = [
   0,0,'empty','empty','empty','empty','empty',1,0,0,
   0,0,1,1,1,1,'empty',1,0,0
 ];
-//let field = [...Array(COLUMN*ROW)].forEach(()=> field = false);
+//let field = [...Array(COLUMN*ROW)].map(v => v = 'empty');
+
 
 const a = 4;
 
@@ -72,19 +74,22 @@ let copyBLOCKS = JSON.parse(JSON.stringify(BLOCKS));
 
 
 function createNewBlock() {
-  controllableBlock = 5;
-  //return controllableBlock = Math.floor( Math.random() * BLOCKS.length );
+  //controllableBlock = 5;
+  return controllableBlock = Math.floor( Math.random() * BLOCKS.length );
 }
 
 function updateBlocks(parts,direction) {
-  const dir = (
+  const plus = (
     (direction === 'down') ? ROW
   : (direction === 'left') ? -1
   : (direction === 'right') ? 1
+  : (direction === 'rotate') ? 0
   : null );
-  for(let i = 0; i < parts.length; i++){
-    parts[i] += dir;
-  }
+
+  parts.forEach((_,i,arr)=>{
+    arr[i] += plus;
+  })
+  
 }
 
 function fixToFirstDigit(number) {
@@ -97,15 +102,11 @@ function resetBlocks() {
 
 
 function updateField(array) {
-  array.forEach((v) => {
-    field[v] = 'current';
-  });
+  array.forEach((v) => field[v] = 'current' );
 }
 
 function clearField() {
-  nowBlocks.forEach((v) => {
-    field[v] = 'empty';
-  });
+  nowBlocks.forEach((v) => field[v] = 'empty' );
 }
 
 function controllableBlocksNumber() {
@@ -130,16 +131,16 @@ function blockMovable() {
     if(typeof v !== "number") {
       return;
     }
-    copyBLOCKS[controllableBlock].number.forEach((_,j,arr) => {
-      if(arr[j] === (i+1)) {
+    copyBLOCKS[controllableBlock].number.forEach((w) => {
+      if(w === (i+1)) {
         console.log('left failed');
         left = false;
       }
-      if(arr[j] === (i-1)) {
+      if(w === (i-1)) {
         console.log('right failed');
         right = false;
       }
-      if(field[i-ROW] === true) {
+      if(field[i-ROW] === 'current') {
         console.log('down failed');
         down = false;
       }
@@ -240,7 +241,48 @@ function translateRectToNum(rotateRect) {
   }
 }
 
+function isRotate(array) {
+  let leftWall = true;
+  let rightWall = true;
+  // wall check left/right
+  array.forEach((v)=>{
+    if(fixToFirstDigit(v) === fixToFirstDigit(ROW)) {
+      leftWall = false;
+    }
+    if(fixToFirstDigit(v) === fixToFirstDigit(ROW-1)) {
+      rightWall = false;
+    }
+  })
 
+  // fixed block check
+  let isFilled = true;
+
+  field.forEach((v,i)=>{
+    if(typeof v !== "number") {
+      return;
+    }
+    array.forEach((w)=>{
+      if(i === w) {
+        console.log(field);
+        console.log(i,w);
+        
+        isFilled = false;
+      }
+    })
+  })
+  
+  
+  if(!leftWall && !rightWall || !isFilled) {  
+    angle -= 90;
+    copyBLOCKS[controllableBlock].number = tmpBlocks;
+    console.log(copyBLOCKS[controllableBlock].number);
+    console.log(nowBlocks);
+    
+    return false;
+  } else {
+    return true;
+  }
+}
 
 function blockRotatableArray() {
   // position of organization point
@@ -248,9 +290,9 @@ function blockRotatableArray() {
   // fix position after rotated
   let fixPosition;
   
-  // cant rotate when it's square
+  // can't rotate |+| block
   if(controllableBlock === 0) {
-    return;
+    return copyBLOCKS[controllableBlock].number;
   }
 
   // bar block
@@ -341,7 +383,9 @@ function blockRotatableArray() {
     return update+nowBlocks[center]+fixPosition;
 
   })
-  return rotateBlocks;
+  rotateBlocks.sort((a, b) => a - b);
+  tmpBlocks = copyBLOCKS[controllableBlock].number;
+  return copyBLOCKS[controllableBlock].number = rotateBlocks;
 }
 
 
@@ -364,8 +408,8 @@ function isBlocksGathersInRow() {
     let completeRowNumbers = []; // row numbers
     oneRowArray.forEach((v,i)=>{
       // skip if the row include 0
-      const isIncludeZero = v.every(item => item !== 'empty');
-      if(isIncludeZero) {
+      const isIncludeEmpty = v.every(item => item !== 'empty');
+      if(isIncludeEmpty) {
         
         completeRowNumbers.push(i);
 
@@ -376,7 +420,7 @@ function isBlocksGathersInRow() {
     })
 
     // delete complete rows
-    completeRowArray.forEach((v)=>{ field[v] = 'empty'; })
+    completeRowArray.forEach((v)=> field[v] = 'empty')
     clearCanvas();
     draw();
 
@@ -391,9 +435,7 @@ function isBlocksGathersInRow() {
       }
     }).filter(f => f);
     
-    lowerBlocks.forEach((v) => {
-      field[v[1]] = v[0]
-    });
+    lowerBlocks.forEach((v) => field[v[1]] = v[0] );
     
     setTimeout(clearCanvas, 1500);
     setTimeout(draw, 1500);
@@ -445,7 +487,9 @@ function draw() {
   })
 }
 
-window.addEventListener('keydown', event => {
+document.body.addEventListener('keydown', event => {
+  console.log(event);
+  
   // down direction
   if (event.isComposing || event.keyCode === 40 && down) {   
     console.log('down')
@@ -474,13 +518,20 @@ window.addEventListener('keydown', event => {
     draw();
     
   } else if (event.isComposing || event.keyCode === 38 && rotate) {
-    console.log('rotate');
     rotateAngle();
-    console.log(angle);
-    clearField();
-    clearCanvas();
-    updateField(blockRotatableArray());
-    draw();
+    
+    if( !isRotate(blockRotatableArray()) ) {
+      console.log('cant rotate');
+      updateField(copyBLOCKS[controllableBlock].number);
+      return;
+    } else {
+      console.log('rotate');
+      clearField();
+      clearCanvas();
+      updateField(blockRotatableArray());
+      updateBlocks(copyBLOCKS[controllableBlock].number,'rotate');
+      draw();
+    }
     
   }
 
@@ -489,13 +540,15 @@ window.addEventListener('keydown', event => {
   
   controllableBlocksNumber();
   
-  if(down === false) {
-    resetBlocks();
-    field.forEach((v,i)=>{
-      if(v === 'current') {
-        field[i] = controllableBlock;
-      }
-    })
+  // if(down === false) {
+  //   console.log('check');
+    
+  //   resetBlocks();
+  //   field.forEach((v,i)=>{
+  //     if(v === 'current') {
+  //       field[i] = controllableBlock;
+  //     }
+  //   })
   //   controllableBlocksNumber();
   //   clearField();
   //   clearCanvas();
@@ -504,12 +557,11 @@ window.addEventListener('keydown', event => {
   //   controllableBlocksNumber();
   //   draw();
   //   down = true;
-  }
-
-  isBlocksGathersInRow();
-  console.log(field);
+  //}
+  console.log(angle);
   console.log(nowBlocks);
   
+  isBlocksGathersInRow();
 });
 
 
@@ -519,5 +571,4 @@ window.addEventListener('load',()=>{
   draw();
   controllableBlocksNumber();
   blockMovable();
-  console.log(field);
 })
