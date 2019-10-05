@@ -13,25 +13,7 @@ let isComplete = false;
 const ROW = 10;
 const COLUMN = 14;
 
-/**
- * Array
- */
-// let field: Array< string | number> = [
-//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-//   'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-//   'empty','empty','empty','empty','empty','empty','empty',1,'empty','empty',
-//   'empty','empty','empty','empty','empty','empty','empty',1,'empty','empty',
-//   0,0,'empty','empty','empty','empty','empty',1,0,0,
-//   0,0,1,1,1,1,'empty',1,0,0
-// ];
+
 let field: Array< string | number> = [...Array(COLUMN*ROW)].map(v => v = 'empty');
 
 
