@@ -34,7 +34,6 @@ interface memoryField {
 interface Update {
   field: Data.field;
   initField: () => void;
-  memoryField: Array<memoryField>;
   oneRowArray: Array<Array<string | number>>;
   resetOneRowArray: () => void;
   completeRowNumbers: Array<number>;
@@ -42,7 +41,6 @@ interface Update {
   deleteRow: (fieldArray: Data.field) => void;
   dropRow: (fieldArray: Data.field) => void;
   transferToFix: (fieldArray: Data.field) => void;
-  moreDroppable: (fieldArray: Data.field) => void;
   transfer: (block: Array<number>, fieldArray: Data.field) => void;
   clear: (current: Array<number>, fieldArray: Data.field) => void;
   reGenerateBlock: () => Data.Prop;
@@ -73,19 +71,6 @@ export const Update: Update = {
     //   ];
   },
 
-  memoryField: [
-    { fieldNumber: [120,121,131,132], color: 6 },
-    { fieldNumber: [133,134,135,136], color: 1 },
-    { fieldNumber: [127,128,129,139], color: 3 },
-    { fieldNumber: [123,124,125,126], color: 1 },
-    { fieldNumber: [110,111], color: 0 },
-    { fieldNumber: [113,114,115], color: 4 },
-    { fieldNumber: [105,116], color: 5 },
-    { fieldNumber: [97,107,117], color: 1 },
-    { fieldNumber: [118,119], color: 0 },
-    { fieldNumber: [93,103], color: 3 },
-    { fieldNumber: [81,82,92,102], color: 2 },
-  ],
 
   oneRowArray: [],
   resetOneRowArray: function() {
@@ -149,12 +134,6 @@ export const Update: Update = {
         fieldArray[i] = State.Block.blockNumber;
       }
     })
-  },
-
-  moreDroppable: function(fieldArray) {
-    // blow the closest deleted row
-
-    
   },
 
   transfer: (block, fieldArray) => {

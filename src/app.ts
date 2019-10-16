@@ -142,7 +142,6 @@ function completeRowFlow() {
       Render.renderField();
       Render.renderBlock(Controll.Update.field);
       Controll.Update.transferToFix(Controll.Update.field);
-      Controll.Update.moreDroppable(Controll.Update.field);
 
       await Fn.sleep(300);
 
@@ -162,6 +161,15 @@ function failureRowFlow() {
     State.Movable.pause = true;
 
     (async () => {
+      // delay for continue //
+      await Fn.sleep(500);
+
+      if(State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number)) {
+        State.Movable.pause = false;
+        return;
+      }
+      // delay for continue //
+
       Controll.Update.transferToFix(Controll.Update.field);
       await Fn.sleep(300);
       continueGame();
@@ -182,18 +190,18 @@ window.addEventListener('keydown', event => {
 		return;
   }
 
+  leftFlow(event);
+
+  rightFlow(event);
+
+  rotateFlow(event);
+
   // pause check
   if(State.Movable.pause) {
     return;
   }
   
   downFlow(event);
-
-  leftFlow(event);
-
-  rightFlow(event);
-
-  rotateFlow(event);
 
   completeRowFlow();
 
