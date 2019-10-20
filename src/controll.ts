@@ -1,6 +1,7 @@
 import * as Data from './data';
 import * as Fn from './function';
 import * as State from './state';
+import { callbackify } from 'util';
 const clonedeep = require('lodash/cloneDeep');
 
 export const Direction = {
@@ -24,12 +25,9 @@ export const Direction = {
       arr[i] += 0;
     })
   },
+
 }
 
-interface memoryField {
-  fieldNumber: Array<number>;
-  color: number;
-}
 
 interface Update {
   field: Data.field;
@@ -38,6 +36,10 @@ interface Update {
   resetOneRowArray: () => void;
   completeRowNumbers: Array<number>;
   resetCompleteRowNumbers: () => void;
+  remainRowArray: Array<Array<string | number>>;
+  resetRemainRowArray: () => void;
+  remainRowNumbers: Array<number>;
+  resetRemainRowNumbers: () => void;
   deleteRow: (fieldArray: Data.field) => void;
   dropRow: (fieldArray: Data.field) => void;
   transferToFix: (fieldArray: Data.field) => void;
@@ -53,22 +55,22 @@ export const Update: Update = {
   initField: function() {
     return this.field = [...Array(Data.NUMBER.COLUMN * Data.NUMBER.ROW)].map(
       v => v = Data.STRING.EMPTY);
-    // return this.field = [
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty',2,2,'empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty',2,3,'empty','empty','empty',1,'empty','empty',
-    //     'empty','empty',2,3,'empty','empty','empty',1,'empty','empty',
-    //     0,0,3,3,4,'empty','empty',1,0,0,
-    //     0,0,'empty',4,4,4,'empty',1,0,0,
-    //     6,6,'empty',1,1,1,1,3,3,3,
-    //     'empty',6,6,1,1,1,1,'empty','empty',3
-    //   ];
+    return this.field = [
+        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+        'empty','empty',1,'empty','empty','empty',4,1,'empty',3,
+        0,'empty',1,'empty','empty',1,1,1,'empty',3,
+        0,0,1,1,'empty',1,1,1,1,3
+      ];
   },
 
 
@@ -82,48 +84,124 @@ export const Update: Update = {
     this.completeRowNumbers = [];
   },
 
+  remainRowArray: [],
+  resetRemainRowArray: function() {
+    this.remainRowArray = [];
+  },
+  remainRowNumbers: [],
+  resetRemainRowNumbers: function() {
+    this.remainRowNumbers = [];
+  },
+
   deleteRow: function(fieldArray) {
+
+    // create arrays for deleting rows
+    let completeRowArray: Array<number> = []; // should delete areas
+
     
-    if(State.Complete._flag) {
-      // create arrays for deleting rows
-      let completeRowArray: Array<number> = []; // should delete areas
-      
-      this.oneRowArray.forEach((v,i)=>{
+    this.oneRowArray.forEach((v,i)=>{
 
-        const checkROWs = v.every(item => item !== Data.STRING.EMPTY);
-        if( !checkROWs) {
-          return
-        }
+      const checkEmpty = v.some(item => item === Data.STRING.EMPTY);
+      const checkCurrent = v.some(item => item === Data.STRING.CURRENT);
+      const checkNumber = v.some(item => typeof item === 'number');
 
-        this.completeRowNumbers.push(i);
+      const checkROWs = v.every(item => item !== Data.STRING.EMPTY);
 
-        [...Array(Data.NUMBER.ROW)].forEach((_,j)=>{
-          completeRowArray.push(( i * Data.NUMBER.ROW ) + j );
-        })
+      if( (checkEmpty && checkNumber) || checkCurrent && !checkROWs) {
+        this.remainRowArray.push(v);
+        this.remainRowNumbers.push(i);
+      }
+
+      if( !checkROWs) {
+        return
+      }
+
+      this.completeRowNumbers.push(i);
+
+      [...Array(Data.NUMBER.ROW)].forEach((_,j)=>{
+        completeRowArray.push(( i * Data.NUMBER.ROW ) + j );
       })
-		
-      // delete complete rows
-      completeRowArray.forEach((v)=> fieldArray[v] = Data.STRING.EMPTY);
-    }
-
+    })
+    
+    // delete complete rows
+    completeRowArray.forEach((v)=> fieldArray[v] = Data.STRING.EMPTY);
+    
   },
 
   dropRow: function(fieldArray) {
+    
+    // first, drop remainRow
+
+    if(this.remainRowNumbers.length > 0) {
+  
+      const reverseNum = this.remainRowNumbers.reverse();
+      const reverseRow = this.remainRowArray.reverse();   
+      
+      const loop = () => {
+
+        reverseNum.forEach((v,i)=>{
+
+          let start = ( v * Data.NUMBER.ROW) + Data.NUMBER.ROW;
+
+          if(start >= this.field.length) {
+            return
+          }
+
+          const check = Fn.filterUndef(fieldArray.map((_,k) =>{ 
+            if(k >= start && k <= (start + Data.NUMBER.ROW - 1) ) {
+              return k;
+            }
+          }));
+          
+          
+          if(check.every(x => fieldArray[x] === Data.STRING.EMPTY)) {
+            
+            [...Array(Data.NUMBER.ROW)].forEach((_,j)=>{
+              
+              let value = reverseRow[i][j];
+
+              fieldArray[start + j] = value;
+              fieldArray[(start - Data.NUMBER.ROW ) + j] = Data.STRING.EMPTY;
+              
+            })
+          }
+        })
+      }
+      
+      const increment = () => {
+        [...Array(reverseNum.length)].forEach((_,j)=>{
+          
+          if(reverseNum[j] >= Data.NUMBER.COLUMN) {
+            return
+          }
+          
+          reverseNum[j] += 1;
+        })
+      }
+
+
+      [...Array(this.remainRowNumbers.length)].forEach(()=>{ 
+        loop();
+        increment();
+      })
+
+    }
+    
     // move blocks as the amount of deleted rows
-		const lowerBlocks: [string|number,number][] = Fn.filterUndef(fieldArray.map((v,i,arr)=>{
-      if (i >= this.completeRowNumbers[0] * Data.NUMBER.ROW) {
-        return;
-      }
-      if(v !== Data.STRING.EMPTY) {
-        arr[i] = Data.STRING.EMPTY;
-        return [ v , i + (this.completeRowNumbers.length * Data.NUMBER.ROW)];
-      }
-		}));
+		// const lowerBlocks: [string|number,number][] = Fn.filterUndef(fieldArray.map((v,i,arr)=>{
+    //   if (i >= this.completeRowNumbers[0] * Data.NUMBER.ROW) {
+    //     return;
+    //   }
+    //   if(v !== Data.STRING.EMPTY) {
+    //     arr[i] = Data.STRING.EMPTY;
+    //     return [ v , i + (this.completeRowNumbers.length * Data.NUMBER.ROW)];
+    //   }
+		// }));
 		
-    lowerBlocks.forEach((v) =>{
-			const index = v[1];
-			fieldArray[index] = v[0] 
-    });
+    // lowerBlocks.forEach((v) =>{
+		// 	const index = v[1];
+		// 	fieldArray[index] = v[0] 
+    // });
     
   },
 

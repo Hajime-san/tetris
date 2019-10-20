@@ -4,11 +4,49 @@ import * as Controll from './controll';
 import * as State from './state';
 import * as Action from './event';
 import * as Render from './render';
-//const clonedeep = require('lodash/cloneDeep');
+import * as Debug from './dev';
 
+/** 
+  setInterval event
+*/
+let intervalDownMove = downMove();
+
+let intervalDownCheck = downCheck();
+
+function downMove() {
+  if(Debug.Settings.autoMove) {
+    return window.setInterval(downFlow, Data.SETTING.SPEED);
+  }
+}
+
+function downCheck() {
+  if(Debug.Settings.autoMove) {
+    return window.setInterval(()=>{
+      if( !State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) ) {
+    
+        clearInterval(intervalDownMove);
+        clearInterval(intervalDownCheck);
+        
+        completeRowFlow();
+    
+        failureRowFlow();
+      }
+    }, Data.SETTING.SPEED)
+  }
+}
+/******************************************/ 
+
+
+/** 
+  init
+*/
 function init() {
   // push cleared field
   Controll.Update.initField();
+  // increment block count
+  State.Info.incrementCount();
+  // pick block queue
+  State.blockQueue.creatQueue(State.Info.count);
   // define block number
   State.Block.blockNumber;
   // define block
@@ -21,7 +59,17 @@ function init() {
   Render.renderBlock(Controll.Update.field);
 }
 
+window.addEventListener('load',()=>{
+  init();
+  
+})
+
+/******************************************/
+
 function continueGame() {
+  // increment block count
+  State.Info.incrementCount();
+
   // reset block
   const reset = Controll.Update.reGenerateBlock();
   State.Block.deepCopy = reset;
@@ -31,29 +79,35 @@ function continueGame() {
   Controll.Update.resetCompleteRowNumbers();
   // reset one row array
   Controll.Update.resetOneRowArray();
+  // reset remain row numbers
+  Controll.Update.resetRemainRowNumbers();
+  // reset remain row array
+  Controll.Update.resetRemainRowArray();
   // reset row check
   State.Complete.resetCheck();
-  
-  // define block number
-  State.Block.resetBlockNumber();
+  // pick block queue
+  State.blockQueue.creatQueue(State.Info.count);
   // define block
   State.Block.current = State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number;
   // update field info
   Controll.Update.transfer(State.Block.current, Controll.Update.field);
-  // draw grid
-  Render.renderField();
   // draw block
   Render.renderBlock(Controll.Update.field);
 
   // allow user action
   State.Movable.pause = false;
+
+  // restart interval down
+  clearInterval(intervalDownMove);
+  intervalDownMove = downMove();
+  clearInterval(intervalDownCheck);
+  intervalDownCheck = downCheck();
   
 }
 
 // down posibility check && down input check
-function downFlow(event: KeyboardEvent) {
-  if(State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) && 
-    Action.UserEvent.down(event) ) {
+function downFlow() {
+  if(State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number)) {
 
     Controll.Update.clear(State.Block.current, Controll.Update.field);
     Controll.Direction.down(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number);
@@ -65,10 +119,9 @@ function downFlow(event: KeyboardEvent) {
   }
 }
 
-// left posibility check && left input check
-function leftFlow(event: KeyboardEvent) {
-  if(State.Movable.left(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) &&
-    Action.UserEvent.left(event)) {
+// left posibility check
+function leftFlow() {
+  if(State.Movable.left(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) ) {
 
     Controll.Update.clear(State.Block.current, Controll.Update.field);
     Controll.Direction.left(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number);
@@ -81,10 +134,9 @@ function leftFlow(event: KeyboardEvent) {
   }
 }
 
-// right posibility check && right input check
-function rightFlow(event: KeyboardEvent) {
-  if(State.Movable.right(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) &&
-    Action.UserEvent.right(event)) {
+// right posibility check
+function rightFlow() {
+  if(State.Movable.right(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) ) {
 
     Controll.Update.clear(State.Block.current, Controll.Update.field);
     Controll.Direction.right(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number);
@@ -97,12 +149,11 @@ function rightFlow(event: KeyboardEvent) {
   }
 }
 
-// rotate posibility check && rotate input check
-function rotateFlow(event: KeyboardEvent) {
+// rotate posibility check
+function rotateFlow() {
   if(State.Movable.rotate(Controll.Update.field,
     State.rotatedBlock(State.Block.current, State.Block.angle),
-    State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) &&
-    Action.UserEvent.rotate(event)) {
+    State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number)) {
 
     State.Block.angle = Data.NUMBER.DEGREES;
     
@@ -119,16 +170,20 @@ function rotateFlow(event: KeyboardEvent) {
   }
 }
 
-// down failed & row check true
+// down failed & row complete
 function completeRowFlow() {
   
   if( !State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) &&
   State.Complete.check(Controll.Update.field)) {
     // stop user action
     State.Movable.pause = true;
-
+    // clear interval
+    clearInterval(intervalDownMove);
+    clearInterval(intervalDownCheck);
+    
     (async () => {
       await Fn.sleep(300);
+      
       // delete row rendering
       Controll.Update.deleteRow(Controll.Update.field);
       Render.clearField();
@@ -152,7 +207,7 @@ function completeRowFlow() {
   }
 }
 
-// down failed & row check failed
+// down failed & row incomplete
 function failureRowFlow() {
   if( !State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) &&
      !State.Complete.check(Controll.Update.field)) {
@@ -160,15 +215,24 @@ function failureRowFlow() {
     // stop user action
     State.Movable.pause = true;
 
+    // clear interval
+    clearInterval(intervalDownMove);
+    clearInterval(intervalDownCheck);
+
     (async () => {
       // delay for continue //
       await Fn.sleep(500);
 
       if(State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number)) {
+
         State.Movable.pause = false;
+
+        intervalDownMove = downMove();
+        intervalDownCheck = downCheck();
         return;
       }
       // delay for continue //
+
 
       Controll.Update.transferToFix(Controll.Update.field);
       await Fn.sleep(300);
@@ -180,28 +244,37 @@ function failureRowFlow() {
 
 
 
-window.addEventListener('load',()=>{
-  init();
-  
-})
 
+/** 
+  User input
+*/
 window.addEventListener('keydown', event => {
   if( !event.isTrusted) {
 		return;
   }
+  
 
-  leftFlow(event);
-
-  rightFlow(event);
-
-  rotateFlow(event);
 
   // pause check
   if(State.Movable.pause) {
     return;
   }
-  
-  downFlow(event);
+
+  if(Action.UserEvent.left(event)) {
+    leftFlow();
+  }
+
+  if(Action.UserEvent.right(event)) {
+    rightFlow();
+  }
+
+  if(Action.UserEvent.rotate(event)) {
+    rotateFlow();
+  }
+
+  if(Action.UserEvent.down(event) ) {
+    downFlow();
+  }
 
   completeRowFlow();
 

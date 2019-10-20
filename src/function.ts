@@ -8,6 +8,20 @@ export function filterUndef<T>(ts: (T | undefined)[]): T[] {
 	return ts.filter((t: T | undefined): t is T => !!t)
 }
 
+declare global {
+  interface Array<T> {
+    shuffle(): Array<T>;
+  }
+}
+
+export const shuffle = Symbol('shuffle');
+
+Array.prototype.shuffle = function() {
+  return this.map(a => [a, Math.random()] )
+              .sort((a, b) => a[1] - b[1] )
+              .map(a => a[0] );
+}
+
 export function sleep(ms: number): Promise<void> {
   return new Promise<void>(resolve => setTimeout(resolve, ms));
 }

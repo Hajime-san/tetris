@@ -12,7 +12,11 @@ export const NUMBER = {
   RIGHT_KEY: 39,
   LEFT_MOVE: -1,
   RIGHT_MOVE: 1,
-  DEGREES: 90
+  DEGREES: 90,
+}
+
+export const SETTING = {
+  SPEED: 1000,
 }
 
 export const STRING = {
@@ -98,4 +102,8 @@ export const Prop: Prop = {
       color: 'pink',
     },
   ]
+}
+
+export const BlockPick = {
+  planA: []
 }

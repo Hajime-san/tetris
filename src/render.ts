@@ -31,6 +31,7 @@ export function renderField() {
   // line settings
   ctx.lineWidth = 1;
   ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+  
 
   // outline
   const outline = new Path2D();

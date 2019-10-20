@@ -151,8 +151,15 @@ export const Movable = {
     this.rotate, this.left, this.right, this.down;
   },
 
-  pause: false,
-
+  _pause: false,
+  get pause () { return this._pause; },
+  set pause (move) {
+    if(move) {
+      this._pause = true;
+    } else {
+      this._pause = false;
+    }
+  },
 }
 
 interface complete {
@@ -202,27 +209,64 @@ export const Complete: complete = {
   
 }
 
+interface blockQueue {
+  creatQueue: (count: number) => void;
+  _queue: Array<number>;
+  queue: Array<number>;
+}
+
+export const blockQueue: blockQueue = {
+  
+  creatQueue: function (count: number) {
+
+    if(count >= 1) {
+      this._queue.shift();
+    }
+    if(count === 1) {
+      [...Array(Data.Prop.BLOCKS.length)]
+        .map((_,i) => i ).shuffle()
+        .forEach(v => this._queue.push(v) )
+    }
+    if(this._queue.length > 0 && this._queue.length < 4) {
+      const random = () => Math.floor( Math.random() * Data.Prop.BLOCKS.length );
+
+      while(true) {
+        let serve = random();
+        if(!this._queue.includes(serve)) {
+          this._queue.push(serve);
+          break;
+        }
+      }
+
+    }
+  },
+
+  _queue: [],
+  set queue (setQueue: Array<number>) {
+    this._queue = setQueue;
+  },
+  get queue () {
+    return this._queue;
+  },
+
+}
+
 
 interface Block {
   deepCopy: Data.Prop;
   blockNumber: number;
-  resetBlockNumber: () => void;
   _angle: number;
   angle: number;
   resetAngle: () => void;
   current: Array<number>;
   _current: Data.field;
 }
-
 // mutable objects
 export const Block: Block = {
 
   deepCopy : clonedeep(Data.Prop),
 
-  blockNumber : //5,
-  Math.floor( Math.random() * Data.Prop.BLOCKS.length ),
-  resetBlockNumber: function() {
-    return this.blockNumber = Math.floor( Math.random() * Data.Prop.BLOCKS.length );
+  get blockNumber () { return blockQueue.queue[0] 
   },
 
   _angle: 0,
@@ -248,8 +292,6 @@ export const Block: Block = {
     });
   },
 }
-
-
 
 export const rotatedBlock = (block: Array<number>, angle: number) => {
   // position of organization point
@@ -380,4 +422,30 @@ export const rotatedBlock = (block: Array<number>, angle: number) => {
   }).sort((a, b) => a - b);
 
   return rotateBlocks;
+}
+
+export const Info = {
+  count: 0,
+  incrementCount: function() {
+    return this.count += 1;
+  }
+}
+
+
+export const Playable = {
+
+  _flag: true,
+  continue: function(fieldArray: Data.field) {
+
+
+    return this._flag;
+  },
+
+  intervalContinueCheck(num: number) {
+    //const check = setInterval(tmp, num);
+    // if( !tmp) {
+
+    // }
+  }
+
 }
