@@ -7,14 +7,21 @@ const canvasWidth = Data.canvas.width;
 const canvasHeight = Data.canvas.height;
 
 const GRID_SIZE = {
-  HORIZON: 300,
-  VERTICAL: 420,
+  HORIZON: 270,
+  VERTICAL: 378,
   STANDARD: 7,
-  STEP: 30,
+  STEP: 27,
+}
+
+const TEXT = {
+  FONT: 'Osaka',
+  FONTSIZE: '16px ',
+  NEXT: 'Next',
+
 }
 
 export function clearField() {
-	if (!ctx) {
+	if ( !ctx) {
     return;
   }
   ctx.clearRect(GRID_SIZE.STANDARD - 7,
@@ -24,7 +31,7 @@ export function clearField() {
 }
 
 export function renderField() {
-  if (!ctx) {
+  if ( !ctx) {
     return;
   }
 
@@ -53,10 +60,14 @@ export function renderField() {
   }
   ctx.stroke(grid);
 
+  // info
+  ctx.font = `${TEXT.FONTSIZE + TEXT.FONT}`;
+  ctx.fillText(TEXT.NEXT, 325, 20);
+
 }
 
 export function renderBlock(fieldArray: Data.field) {
-  if (!ctx) {
+  if ( !ctx) {
     return;
   }
 
@@ -83,4 +94,54 @@ export function renderBlock(fieldArray: Data.field) {
       ctx.fill();
     }
   })
+}
+
+export function renderQueue(queue: Data.field) {
+  if ( !ctx) {
+    return;
+  }
+
+
+  const num = State.blockQueue.queue[1];
+  console.log(State.blockQueue.queue[1]);
+  let angle = 0;
+
+  if(num === 0) {
+    angle = 0;
+  }
+  if(num !== 0 && num !== 2) {
+    angle = Data.NUMBER.DEGREES;
+  }
+  if(num === 2) {
+    angle = Data.NUMBER.DEGREES * 3;
+  }
+
+  let block = State.rotatedBlock(Data.Prop.BLOCKS[num].number, angle, false);
+
+  
+  const translatedBlock = Fn.filterUndef(block.map((v,i,arr)=> {
+    if(v < Data.NUMBER.QUEUE_COLUMN) {
+      return Math.abs(v -= Data.NUMBER.a)
+    }
+    if(v > Data.NUMBER.QUEUE_COLUMN) {
+      return Math.abs(v -= Data.NUMBER.QUEUE_COLUMN);
+    }
+  }))
+  console.log(translatedBlock);
+  translatedBlock.forEach(v => queue[v] = State.blockQueue.queue[1])
+  console.log(queue);
+  
+  
+  queue.forEach((v,i)=>{
+    if(v === Data.STRING.EMPTY) {
+      return;
+    }
+    
+    ctx.fillStyle = Data.Prop.BLOCKS[num].color;
+    ctx.fillRect((Fn.fixToFirstDigit(i) * GRID_SIZE.STEP) + (300),
+                (Math.floor(i / Data.NUMBER.QUEUE_ROW) * GRID_SIZE.STEP) + (20),
+                                      GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
+    ctx.fill();
+  })  
+
 }

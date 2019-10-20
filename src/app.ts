@@ -57,6 +57,8 @@ function init() {
   Render.renderField();
   // draw block
   Render.renderBlock(Controll.Update.field);
+
+  Render.renderQueue(Controll.Update.queueField);
 }
 
 window.addEventListener('load',()=>{
@@ -96,6 +98,7 @@ function continueGame() {
 
   // allow user action
   State.Movable.pause = false;
+  State.Movable.checkTime = false;
 
   // restart interval down
   clearInterval(intervalDownMove);
@@ -152,14 +155,14 @@ function rightFlow() {
 // rotate posibility check
 function rotateFlow() {
   if(State.Movable.rotate(Controll.Update.field,
-    State.rotatedBlock(State.Block.current, State.Block.angle),
+    State.rotatedBlock(State.Block.current, State.Block.angle, true),
     State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number)) {
 
     State.Block.angle = Data.NUMBER.DEGREES;
     
     Controll.Update.clear(State.Block.current, Controll.Update.field);
     Controll.Direction.rotate(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number);
-    State.Block.current = State.rotatedBlock(State.Block.current, State.Block.angle);
+    State.Block.current = State.rotatedBlock(State.Block.current, State.Block.angle, true);
     State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number = State.Block.current;
     Controll.Update.transfer(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number, Controll.Update.field);
     
@@ -177,6 +180,7 @@ function completeRowFlow() {
   State.Complete.check(Controll.Update.field)) {
     // stop user action
     State.Movable.pause = true;
+    State.Movable.checkTime = true;
     // clear interval
     clearInterval(intervalDownMove);
     clearInterval(intervalDownCheck);
@@ -186,6 +190,7 @@ function completeRowFlow() {
       
       // delete row rendering
       Controll.Update.deleteRow(Controll.Update.field);
+      State.Info.incrementCompletedRow();
       Render.clearField();
       Render.renderField();
       Render.renderBlock(Controll.Update.field);
@@ -232,10 +237,11 @@ function failureRowFlow() {
         return;
       }
       // delay for continue //
-
+      State.Movable.pause = true;
+      State.Movable.checkTime = true;
 
       Controll.Update.transferToFix(Controll.Update.field);
-      await Fn.sleep(300);
+      await Fn.sleep(100);
       continueGame();
     })();
   }
@@ -252,14 +258,11 @@ window.addEventListener('keydown', event => {
   if( !event.isTrusted) {
 		return;
   }
-  
 
-
-  // pause check
-  if(State.Movable.pause) {
+  if(State.Movable.checkTime) {
     return;
   }
-
+  
   if(Action.UserEvent.left(event)) {
     leftFlow();
   }
@@ -272,6 +275,11 @@ window.addEventListener('keydown', event => {
     rotateFlow();
   }
 
+  // pause check
+  if(State.Movable.pause) {
+    return;
+  }
+
   if(Action.UserEvent.down(event) ) {
     downFlow();
   }
@@ -279,6 +287,6 @@ window.addEventListener('keydown', event => {
   completeRowFlow();
 
   failureRowFlow();
-
   
+
 }, {passive: false});

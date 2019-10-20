@@ -110,7 +110,7 @@ export const Movable = {
     let rightWall = true;
 
     const angle = Block.angle + Data.NUMBER.DEGREES;
-    const tmpBlock = rotatedBlock(copyBlock, angle);
+    const tmpBlock = rotatedBlock(copyBlock, angle, true);
     currentBlock = tmpBlock;
     
     // wall check left/right
@@ -158,6 +158,16 @@ export const Movable = {
       this._pause = true;
     } else {
       this._pause = false;
+    }
+  },
+
+  _checkTIme: false,
+  get checkTime () { return this._checkTIme; },
+  set checkTime (move) {
+    if(move) {
+      this._checkTIme = true;
+    } else {
+      this._checkTIme = false;
     }
   },
 }
@@ -293,7 +303,7 @@ export const Block: Block = {
   },
 }
 
-export const rotatedBlock = (block: Array<number>, angle: number) => {
+export const rotatedBlock = (block: Array<number>, angle: number, fix: boolean) => {
   // position of organization point
   let center: number;
   // fix position after rotated
@@ -413,6 +423,10 @@ export const rotatedBlock = (block: Array<number>, angle: number) => {
     fixPosition = Data.NUMBER.ROW + Data.NUMBER.LEFT_MOVE;
   }
 
+  if( !fix) {
+    fixPosition = 0;
+  }
+
   const rotateBlocks = block.map((v)=>{
         let num: Array<number> = Fn.translateNumberToRect(v, block[center]),
            rect = Fn.rotateMatrix(num),
@@ -428,7 +442,12 @@ export const Info = {
   count: 0,
   incrementCount: function() {
     return this.count += 1;
-  }
+  },
+
+  completedRow: 0,
+  incrementCompletedRow: function() {
+    return this.completedRow += Controll.Update.completeRowNumbers.length;
+  },
 }
 
 

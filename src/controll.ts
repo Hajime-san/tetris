@@ -31,6 +31,7 @@ export const Direction = {
 
 interface Update {
   field: Data.field;
+  queueField: Data.field;
   initField: () => void;
   oneRowArray: Array<Array<string | number>>;
   resetOneRowArray: () => void;
@@ -72,6 +73,9 @@ export const Update: Update = {
         0,0,1,1,'empty',1,1,1,1,3
       ];
   },
+
+  queueField: [...Array(Data.NUMBER.QUEUE_COLUMN * Data.NUMBER.QUEUE_ROW)].map(
+    v => v = Data.STRING.EMPTY),
 
 
   oneRowArray: [],
@@ -180,7 +184,7 @@ export const Update: Update = {
       }
 
 
-      [...Array(this.remainRowNumbers.length)].forEach(()=>{ 
+      [...Array(Data.NUMBER.COLUMN)].forEach(()=>{ 
         loop();
         increment();
       })

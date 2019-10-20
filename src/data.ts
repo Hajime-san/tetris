@@ -13,6 +13,8 @@ export const NUMBER = {
   LEFT_MOVE: -1,
   RIGHT_MOVE: 1,
   DEGREES: 90,
+  QUEUE_ROW: 6,
+  QUEUE_COLUMN: 8,
 }
 
 export const SETTING = {
