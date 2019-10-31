@@ -10,9 +10,10 @@ const ctx = Data.canvas.getContext('2d') as CanvasRenderingContext2D;
 if(Debug.Settings.antiAliasing) {
   ctx.translate(0.5, 0.5);
 }
+
 const QueueProp: Data.Prop = clonedeep(Data.Prop);
 
-const GRID_SIZE = {
+export const GRID_SIZE = {
   HORIZON: 270,
   VERTICAL: 378,
   STANDARD: 7,
@@ -151,15 +152,16 @@ export const Division = {
 
 export const TouchAction = {
   _HORIZON: ((GRID_SIZE.HORIZON + (GRID_SIZE.STANDARD * 2)) / 2),
-  _LENGTH: 15,
   _CENTER: GRID_SIZE.VERTICAL + 60,
+  _LENGTH: 15,
 
   // left button
   left: function () {
     
     const HORIZON = this._HORIZON - (this._HORIZON / 1.4);
-    const LENGTH = this._LENGTH;
     const CENTER = this._CENTER;
+    const LENGTH = this._LENGTH;
+    const RADIANS = this._LENGTH + 5;
 
     // triangle
     const triangle = new Path2D();
@@ -181,17 +183,19 @@ export const TouchAction = {
     const circle = new Path2D();
     ctx.beginPath();
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    circle.arc(HORIZON + 10, CENTER, LENGTH + 5, 0, 2 * Math.PI);
+    circle.arc(HORIZON + 10, CENTER, RADIANS, 0, 2 * Math.PI);
     ctx.stroke(circle);
     
-    return [HORIZON,LENGTH,CENTER];
+    
+    return [HORIZON+LENGTH,CENTER,RADIANS];
   },
 
   // right button
   right: function () {
     const HORIZON = this._HORIZON + (this._HORIZON / 1.4) - this._LENGTH;
-    const LENGTH = this._LENGTH;
     const CENTER = this._CENTER;
+    const LENGTH = this._LENGTH;
+    const RADIANS = this._LENGTH + 5;
 
     // triangle
     const triangle = new Path2D();
@@ -213,17 +217,19 @@ export const TouchAction = {
     const circle = new Path2D();
     ctx.beginPath();
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    circle.arc(HORIZON + 10, CENTER, LENGTH + 5, 0, 2 * Math.PI);
+    circle.arc(HORIZON + 10, CENTER, RADIANS, 0, 2 * Math.PI);
     ctx.stroke(circle);
     
-    return [HORIZON,LENGTH,CENTER];
+    return [HORIZON+LENGTH,CENTER,RADIANS];
   },
 
   // down button
   down: function () {
     const HORIZON = this._HORIZON - (this._HORIZON / 3);
-    const LENGTH = this._LENGTH;
     const CENTER = this._CENTER + (this._LENGTH * 3);
+    const LENGTH = this._LENGTH;
+    const RADIANS = this._LENGTH + 5;
+    
 
     // triangle
     const triangle = new Path2D();
@@ -245,10 +251,44 @@ export const TouchAction = {
     const circle = new Path2D();
     ctx.beginPath();
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    circle.arc(HORIZON + 10, CENTER, LENGTH + 5, 0, 2 * Math.PI);
+    circle.arc(HORIZON + 10, CENTER, RADIANS, 0, 2 * Math.PI);
     ctx.stroke(circle);
     
-    return [HORIZON,LENGTH,CENTER];
+    return [HORIZON+LENGTH,CENTER,RADIANS];
+  },
+
+  // rotate button
+  rotate: function () {
+    const HORIZON = this._HORIZON + (this._HORIZON / 4);
+    const CENTER = this._CENTER + (this._LENGTH * 3);
+    const LENGTH = this._LENGTH;
+    const RADIANS = this._LENGTH + 5;
+    
+
+    // triangle
+    const triangle = new Path2D();
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    triangle.moveTo(HORIZON + (LENGTH / 1.2), CENTER - (LENGTH / 3));
+    triangle.lineTo(HORIZON + (LENGTH / 0.8), CENTER);
+    triangle.lineTo(HORIZON + (LENGTH / 0.6), CENTER - (LENGTH / 3));
+    ctx.stroke(triangle);
+
+    // circleLine
+    const circleLine = new Path2D();
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+    circleLine.arc(HORIZON + 10, CENTER, RADIANS / 2, 0, 180);
+    ctx.stroke(circleLine);
+
+    // circle
+    const circle = new Path2D();
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    circle.arc(HORIZON + 10, CENTER, RADIANS, 0, 2 * Math.PI);
+    ctx.stroke(circle);
+    
+    return [HORIZON+LENGTH,CENTER,RADIANS];
   },
   
 }
@@ -285,6 +325,12 @@ export function renderField() {
   }
   ctx.stroke(grid);
 
+  // touch button
+  TouchAction.left();
+  TouchAction.right();
+  TouchAction.down();
+  TouchAction.rotate();
+
   // info
   ctx.font = `${TEXT.FONTSIZE + TEXT.FONT}`;
   ctx.fillStyle = 'rgb(255,255,255,0.9)';
@@ -309,10 +355,6 @@ export function renderField() {
   ctx.fillText(State.Info.completedRow.toString(),
             (GRID_SIZE.HORIZON + Data.canvasWidth - (lineNumberWidth / 2)) / 2,
             (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 1) ) );
-
-  TouchAction.left();
-  TouchAction.right();
-  TouchAction.down();
 }
 
 export function renderBlock(fieldArray: Data.field) {

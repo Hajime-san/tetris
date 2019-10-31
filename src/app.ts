@@ -1,5 +1,5 @@
-import * as UA from './ua';
 import * as Data from './data';
+import * as UA from './ua';
 import * as Fn from './function';
 import * as Controll from './controll';
 import * as State from './state';
@@ -116,6 +116,11 @@ const init = function() {
       State.Complete.resetCheck();
       // push cleared queu field
       Controll.Update.initQueueField();
+      // reset HUD
+      State.Info.resetCount();
+      State.Info.resetCompletedRow();
+      State.Info.resetLevelandSpeed();
+
       return;
     }
 
@@ -339,11 +344,11 @@ const init = function() {
       leftFlow();
     }
 
-    if(Action.UserEvent.right(key)) {
+    if(Action.UserEvent.right(key) || Action.UserEvent.right(mouse)) {
       rightFlow();
     }
 
-    if(Action.UserEvent.rotate(key)) {
+    if(Action.UserEvent.rotate(key) || Action.UserEvent.rotate(mouse)) {
       rotateFlow();
     }
 
@@ -352,7 +357,7 @@ const init = function() {
       return;
     }
     
-    if(Action.UserEvent.down(key) ) {
+    if(Action.UserEvent.down(key) || Action.UserEvent.down(mouse)) {
       downFlow();
     }
 
@@ -372,6 +377,6 @@ const init = function() {
 
 
 window.addEventListener('load', ()=> {
-  //init();
+  UA.resizeCanvasArea();
   Render.Division.start(init);
 });

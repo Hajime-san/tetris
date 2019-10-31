@@ -7,10 +7,29 @@ export const UserEvent =　 {
 
   _flag: false,
 
-  rotate: function(event: KeyboardEvent) {
-    if(UA.isTouchEnabled) {
+  rotate: function(event: Event) {
+    // when touch device
+    if(UA.isTouchEnabled()) {
+      const mouse = event as MouseEvent;
+      // crate hit area
+      const button = Object.create(onCanvas);
+      button.point(mouse);
+      button.figure = 'circle';
+      button.square.x = Render.TouchAction.rotate()[0];
+      button.square.y = Render.TouchAction.rotate()[1];
+      button.square.r = Render.TouchAction.rotate()[2];
+      
+      if (button.hit()) {
+        if(Debug.Settings.console) {
+          console.log('rotate tapped');
+        }
+        return this._flag = true;
+      }
+      return this._flag = false;
     }
-    if (event.keyCode === Data.NUMBER.UP_KEY) {
+
+    const key = event as KeyboardEvent;
+    if (key.keyCode === Data.NUMBER.UP_KEY) {
       if(Debug.Settings.console) {
         console.log('up inputted');
       }
@@ -29,9 +48,8 @@ export const UserEvent =　 {
       button.square.x = Render.TouchAction.left()[0];
       button.square.y = Render.TouchAction.left()[1];
       button.square.r = Render.TouchAction.left()[2];
+      
 
-      console.log(button);
-    
       if (button.hit()) {
         if(Debug.Settings.console) {
           console.log('left tapped');
@@ -61,8 +79,6 @@ export const UserEvent =　 {
       button.square.x = Render.TouchAction.right()[0];
       button.square.y = Render.TouchAction.right()[1];
       button.square.r = Render.TouchAction.right()[2];
-
-      console.log(button);
     
       if (button.hit()) {
         if(Debug.Settings.console) {
@@ -93,8 +109,6 @@ export const UserEvent =　 {
       button.square.x = Render.TouchAction.down()[0];
       button.square.y = Render.TouchAction.down()[1];
       button.square.r = Render.TouchAction.down()[2];
-    
-      console.log(button);
       
       if (button.hit()) {
         if(Debug.Settings.console) {
