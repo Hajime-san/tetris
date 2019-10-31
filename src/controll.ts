@@ -1,7 +1,6 @@
 import * as Data from './data';
 import * as Fn from './function';
 import * as State from './state';
-import { callbackify } from 'util';
 const clonedeep = require('lodash/cloneDeep');
 
 export const Direction = {
@@ -31,8 +30,9 @@ export const Direction = {
 
 interface Update {
   field: Data.field;
-  queueField: Data.field;
   initField: () => void;
+  queueField: Data.field;
+  initQueueField: () => void;
   oneRowArray: Array<Array<string | number>>;
   resetOneRowArray: () => void;
   completeRowNumbers: Array<number>;
@@ -54,29 +54,32 @@ export const Update: Update = {
   field: [],
 
   initField: function() {
-    return this.field = [...Array(Data.NUMBER.COLUMN * Data.NUMBER.ROW)].map(
-      v => v = Data.STRING.EMPTY);
-    return this.field = [
-        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-        'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-        'empty','empty',1,'empty','empty','empty',4,1,'empty',3,
-        0,'empty',1,'empty','empty',1,1,1,'empty',3,
-        0,0,1,1,'empty',1,1,1,1,3
-      ];
+    return this.field = [...Array(Data.NUMBER.COLUMN * Data.NUMBER.ROW)]
+                       .map(v => v = Data.STRING.EMPTY);
+    // return this.field = [
+    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
+    //     'empty','empty','empty','empty','empty',5,'empty','empty','empty','empty',
+    //     0,1,1,'empty','empty','empty',2,1,4,3,
+    //     0,0,1,1,'empty',1,1,1,1,3
+    //   ];
   },
 
-  queueField: [...Array(Data.NUMBER.QUEUE_COLUMN * Data.NUMBER.QUEUE_ROW)].map(
-    v => v = Data.STRING.EMPTY),
+  queueField: [],
 
+  initQueueField: function () {
+    return this.queueField = [...Array(Data.NUMBER.QUEUE_COLUMN * Data.NUMBER.ROW)]
+                             .map(v => v = Data.STRING.EMPTY);
+  },
 
   oneRowArray: [],
   resetOneRowArray: function() {
@@ -190,22 +193,6 @@ export const Update: Update = {
       })
 
     }
-    
-    // move blocks as the amount of deleted rows
-		// const lowerBlocks: [string|number,number][] = Fn.filterUndef(fieldArray.map((v,i,arr)=>{
-    //   if (i >= this.completeRowNumbers[0] * Data.NUMBER.ROW) {
-    //     return;
-    //   }
-    //   if(v !== Data.STRING.EMPTY) {
-    //     arr[i] = Data.STRING.EMPTY;
-    //     return [ v , i + (this.completeRowNumbers.length * Data.NUMBER.ROW)];
-    //   }
-		// }));
-		
-    // lowerBlocks.forEach((v) =>{
-		// 	const index = v[1];
-		// 	fieldArray[index] = v[0] 
-    // });
     
   },
 

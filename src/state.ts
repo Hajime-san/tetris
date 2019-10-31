@@ -1,6 +1,7 @@
 import * as Fn from './function';
 import * as Data from './data';
 import * as Controll from './controll';
+import * as Debug from './dev';
 const clonedeep = require('lodash/cloneDeep');
 
 /**
@@ -24,7 +25,9 @@ export const Movable = {
       }
       currentBlock.forEach((w: number) => {
         if(w === (i + Data.NUMBER.RIGHT_MOVE)) {
-          console.log(`${Data.STRING.LEFT} failed`);
+          if(Debug.Settings.console) {
+            console.log(`${Data.STRING.LEFT} failed`);
+          }
           this._flag = false;
         }
       })
@@ -33,7 +36,9 @@ export const Movable = {
     // wall check
     currentBlock.forEach((_,i: number,arr: Array<number>) => {
       if(Fn.fixToFirstDigit(arr[i]) === Fn.fixToFirstDigit(Data.NUMBER.ROW)) {
-        console.log(`${Data.STRING.LEFT} walled`);
+        if(Debug.Settings.console) {
+          console.log(`${Data.STRING.LEFT} walled`);
+        }
         this._flag = false;
       }
     })
@@ -55,7 +60,9 @@ export const Movable = {
       }
       currentBlock.forEach((w: number) => {
         if(w === (i + Data.NUMBER.LEFT_MOVE)) {
-          console.log(`${Data.STRING.RIGHT} failed`);
+          if(Debug.Settings.console) {
+            console.log(`${Data.STRING.RIGHT} failed`);
+          }
           this._flag = false;
         }
       })
@@ -64,7 +71,9 @@ export const Movable = {
     // wall check
     currentBlock.forEach((_,i: number,arr: Array<number>) => {
       if(Fn.fixToFirstDigit(arr[i]) === Fn.fixToFirstDigit(Data.NUMBER.ROW + Data.NUMBER.LEFT_MOVE)) {
-        console.log(`${Data.STRING.RIGHT} walled`);
+        if(Debug.Settings.console) {
+          console.log(`${Data.STRING.RIGHT} walled`);
+        }
         this._flag = false;
       }
     })
@@ -86,7 +95,9 @@ export const Movable = {
       }
       currentBlock.forEach(() => {
         if(arr[i - Data.NUMBER.ROW] === Data.STRING.CURRENT) {
-          console.log(`${Data.STRING.DOWN} failed`);
+          if(Debug.Settings.console) {
+            console.log(`${Data.STRING.DOWN} failed`);
+          }
           return this._flag = false;
         }
       })
@@ -96,7 +107,9 @@ export const Movable = {
     currentBlock.forEach((v: number) => {
       const isLastRow = fieldArray.some(some => v >= fieldArray.length - Data.NUMBER.ROW);
       if(isLastRow) {
-        console.log('last row');
+        if(Debug.Settings.console) {
+          console.log('last row');
+        }
         return this._flag = false;
       }
     })
@@ -105,12 +118,12 @@ export const Movable = {
   },
 
   // check rotatable
-  rotate: function(fieldArray: Data.field, currentBlock: Array<number>, copyBlock: Array<number>) {
+  rotate: function(fieldArray: Data.field, currentBlock: Array<number>, copyBlock: Array<number>, blockNumber: number) {
     let leftWall = true;
     let rightWall = true;
 
     const angle = Block.angle + Data.NUMBER.DEGREES;
-    const tmpBlock = rotatedBlock(copyBlock, angle, true);
+    const tmpBlock = rotatedBlock(copyBlock, angle, true, Block.blockNumber);
     currentBlock = tmpBlock;
     
     // wall check left/right
@@ -139,7 +152,9 @@ export const Movable = {
     
     
     if( !leftWall && !rightWall || !isFilled ) {  
-      console.log('cant rotate');
+      if(Debug.Settings.console) {
+        console.log('cant rotate');
+      }
       this._flag = false;
     } else {
       this._flag = true;
@@ -202,12 +217,16 @@ export const Complete: complete = {
       if( !checkROWs) {
         return;
       }
-      console.log('complete!!!!!!');
+      if(Debug.Settings.console) {
+        console.log('complete!!!!!!');
+      }
       Controll.Update.oneRowArray = oneRowArray;
       this._flag = true;
     })
     if(!this._flag) {
-      console.log('complete failed');
+      if(Debug.Settings.console) {
+        console.log('complete failed');
+      }
     }
     
     return this._flag;
@@ -223,6 +242,7 @@ interface blockQueue {
   creatQueue: (count: number) => void;
   _queue: Array<number>;
   queue: Array<number>;
+  resetQueue: () => void;
 }
 
 export const blockQueue: blockQueue = {
@@ -258,6 +278,9 @@ export const blockQueue: blockQueue = {
   get queue () {
     return this._queue;
   },
+  resetQueue: function() {
+    return this._queue = [];
+  }
 
 }
 
@@ -276,7 +299,8 @@ export const Block: Block = {
 
   deepCopy : clonedeep(Data.Prop),
 
-  get blockNumber () { return blockQueue.queue[0] 
+  get blockNumber () {
+    return blockQueue.queue[0];
   },
 
   _angle: 0,
@@ -303,126 +327,127 @@ export const Block: Block = {
   },
 }
 
-export const rotatedBlock = (block: Array<number>, angle: number, fix: boolean) => {
+export const rotatedBlock = (block: Array<number>, angle: number, fix: boolean, blockNumber: number) => {
   // position of organization point
   let center: number;
   // fix position after rotated
   let fixPosition: number;
   
-  // can't rotate |+| block
-  if(Block.blockNumber === 0) {
-    return Block.deepCopy.BLOCKS[Block.blockNumber].number;
+  // O-block (no rotatable)
+  if(blockNumber === 0) {
+    return Block.deepCopy.BLOCKS[blockNumber].number;
   }
 
-  // bar block
-  if(Block.blockNumber === 1){
+  // I-block
+  if(blockNumber === 1){
     center = 1;
   }
-  if(Block.blockNumber === 1 &&
+  if(blockNumber === 1 &&
     angle === 0){
     fixPosition = 0;
   } else if
-    (Block.blockNumber === 1 &&
+    (blockNumber === 1 &&
     angle === Data.NUMBER.DEGREES*3){
     fixPosition = 0;
   } else {
     fixPosition = 1;
   }
 
-  // reverse L block
-  if(Block.blockNumber === 2){
+  // J-block
+  if(blockNumber === 2){
     fixPosition = 0;
   }
-  if(Block.blockNumber === 2 &&
+  if(blockNumber === 2 &&
     angle === 0){
     center = 2;
   } else if
-    (Block.blockNumber === 2 &&
+    (blockNumber === 2 &&
     angle === Data.NUMBER.DEGREES) {
     center = 2;
   } else {
     center = 1;
   }
 
-  // L block
-  if(Block.blockNumber === 3){
+  // L-block
+  if(blockNumber === 3){
     fixPosition = 0;
   }
-  if(Block.blockNumber === 3 &&
+  if(blockNumber === 3 &&
     angle === 0){
     center = 1;
   } else if 
-    (Block.blockNumber === 3 &&
+    (blockNumber === 3 &&
     angle === Data.NUMBER.DEGREES) {
     center = 2;
   } else if
-    (Block.blockNumber === 3 &&
+    (blockNumber === 3 &&
     angle === Data.NUMBER.DEGREES*2) {
     center = 2;
   } else if
-    (Block.blockNumber === 3 &&
+    (blockNumber === 3 &&
     angle === Data.NUMBER.DEGREES*3) {
     center = 1;
   }
 
-  // T block
-  if(Block.blockNumber === 4){
+  // T-block
+  if(blockNumber === 4){
     fixPosition = 0;
   }
-  if(Block.blockNumber === 4 &&
+  if(blockNumber === 4 &&
      angle === 0){
     center = 0;
   } else if
-    (Block.blockNumber === 4 &&
+    (blockNumber === 4 &&
      angle === Data.NUMBER.DEGREES) {
     center = 2;
   } else if
-    (Block.blockNumber === 4 &&
+    (blockNumber === 4 &&
      angle === Data.NUMBER.DEGREES*2) {
     center = 3;
   } else if
-    (Block.blockNumber === 4 &&
+    (blockNumber === 4 &&
      angle === Data.NUMBER.DEGREES*3) {
     center = 1;
   }
 
-  // _| block
-  if(Block.blockNumber === 5){
+  // S-block
+  if(blockNumber === 5){
     fixPosition = 0;
   }
-  if(Block.blockNumber === 5 &&
+  if(blockNumber === 5 &&
      angle === 0){
     center = 3;
     fixPosition = -(Data.NUMBER.ROW + Data.NUMBER.RIGHT_MOVE);
   } else if
-    (Block.blockNumber === 5 &&
+    (blockNumber === 5 &&
      angle === Data.NUMBER.DEGREES) {
     center = 2;
   } else if
-    (Block.blockNumber === 5 &&
+    (blockNumber === 5 &&
      angle === Data.NUMBER.DEGREES*2) {
     center = 3;
   } else if
-    (Block.blockNumber === 5 &&
+    (blockNumber === 5 &&
      angle === Data.NUMBER.DEGREES*3) {
     center = 2;
     fixPosition = Data.NUMBER.ROW + Data.NUMBER.LEFT_MOVE;
   }
 
-  // |_ block
-  if(Block.blockNumber === 6){
+  // Z-block
+  if(blockNumber === 6){
     center = 2;
     fixPosition = 0;
   }
-  if (Block.blockNumber === 6 &&
+  if (blockNumber === 6 &&
      angle === 0) {
     fixPosition = -(Data.NUMBER.ROW + Data.NUMBER.RIGHT_MOVE);
   }
-  if (Block.blockNumber === 6 &&
+  if (blockNumber === 6 &&
      angle === Data.NUMBER.DEGREES*3) {
     fixPosition = Data.NUMBER.ROW + Data.NUMBER.LEFT_MOVE;
   }
 
+  // for queue rendering option
   if( !fix) {
     fixPosition = 0;
   }
@@ -443,11 +468,40 @@ export const Info = {
   incrementCount: function() {
     return this.count += 1;
   },
+  resetCount: function () {
+    return this.count = 0;
+  },
 
   completedRow: 0,
   incrementCompletedRow: function() {
     return this.completedRow += Controll.Update.completeRowNumbers.length;
   },
+  resetCompletedRow: function() {
+    return this.completedRow = 0;
+  },
+
+  speed: 1000,
+  level: 0,
+  n: 10,
+
+  incrementLevelandSpeed: function() {
+    const N = 10;
+    if(this.completedRow === 0) {
+      return
+    }
+    
+    if((this.completedRow % this.n) < 4 && (this.completedRow / this.n) >= 1) {
+      if(this.speed >= 100) {
+        this.n += N;
+        this.speed -= 100;
+      }
+      return this.level += 1;
+    }
+  },
+  resetLevelandSpeed: function() {
+    return this.level = 0, this.speed = 1000;
+  }
+
 }
 
 
@@ -455,16 +509,19 @@ export const Playable = {
 
   _flag: true,
   continue: function(fieldArray: Data.field) {
-
-
+    fieldArray.forEach((_,__,arr)=>{
+      Data.Prop.BLOCKS[blockQueue.queue[1]].number.forEach((w,j,arr2)=>{
+        if(typeof arr[w] === 'number') {
+          this._flag = false;
+        } else {
+          this._flag = true;
+        }
+      })
+    })
     return this._flag;
   },
 
-  intervalContinueCheck(num: number) {
-    //const check = setInterval(tmp, num);
-    // if( !tmp) {
-
-    // }
+  resetContinue: function() {
+    return this._flag = true;
   }
-
 }

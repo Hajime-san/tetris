@@ -1,6 +1,8 @@
 import * as Fn from './function';
 
 export const canvas = <HTMLCanvasElement> document.getElementById('canvas');
+export const canvasWidth = canvas.width;
+export const canvasHeight = canvas.height;
 
 export const NUMBER = {
   ROW: 10,
@@ -10,15 +12,12 @@ export const NUMBER = {
   UP_KEY: 38,
   LEFT_KEY: 37,
   RIGHT_KEY: 39,
+  ENTER_KEY: 13,
   LEFT_MOVE: -1,
   RIGHT_MOVE: 1,
   DEGREES: 90,
   QUEUE_ROW: 6,
   QUEUE_COLUMN: 8,
-}
-
-export const SETTING = {
-  SPEED: 1000,
 }
 
 export const STRING = {
@@ -39,8 +38,19 @@ export interface Blocks {
   color: string;
 }
 
+export const rgba = [
+  [240, 241, 77, 1.0],
+  [105, 241, 240, 1.0],
+  [27, 68, 241, 1.0],
+  [240, 161, 63, 1.0],
+  [163, 77, 240, 1.0],
+  [114, 242, 63, 1.0],
+  [237, 56, 51, 1.0]
+]
+
 export const Prop: Prop = {
   BLOCKS : [
+    // O-block
     {
       number: [
         NUMBER.a,
@@ -48,16 +58,18 @@ export const Prop: Prop = {
         NUMBER.a+NUMBER.ROW,
         NUMBER.a+NUMBER.ROW+1
       ],
-      color: 'red',
+      color: `rgba(${rgba[0]})`,
     },
+    // I-block
     {
       number: [
         NUMBER.a,
         NUMBER.a+NUMBER.ROW,
         NUMBER.a+(NUMBER.ROW*2),
         NUMBER.a+(NUMBER.ROW*3)],
-      color: 'blue',
+      color: `rgba(${rgba[1]})`,
     },
+    // J-block
     {
       number: [
         NUMBER.a,
@@ -65,8 +77,9 @@ export const Prop: Prop = {
         NUMBER.a+NUMBER.ROW,
         NUMBER.a+(NUMBER.ROW*2)
       ],
-      color: 'green',
+      color: `rgba(${rgba[2]})`,
     },
+    // L-block
     {
       number: [
         NUMBER.a,
@@ -74,8 +87,9 @@ export const Prop: Prop = {
         NUMBER.a+NUMBER.ROW+1,
         NUMBER.a+(NUMBER.ROW*2)+1
       ],
-      color: 'orange',
+      color: `rgba(${rgba[3]})`,
     },
+    // T-block
     {
       number: [
         NUMBER.a,
@@ -83,8 +97,9 @@ export const Prop: Prop = {
         NUMBER.a+NUMBER.ROW+1,
         NUMBER.a+(NUMBER.ROW*2)
       ],
-      color: 'yellow',
+      color: `rgba(${rgba[4]})`,
     },
+    // S-block
     {
       number: [
         NUMBER.a,
@@ -92,8 +107,9 @@ export const Prop: Prop = {
         NUMBER.a+NUMBER.ROW+1,
         NUMBER.a+(NUMBER.ROW*2)+1
       ],
-      color: 'purple',
+      color: `rgba(${rgba[5]})`,
     },
+    // Z-block
     {
       number: [
         NUMBER.a+1,
@@ -101,11 +117,7 @@ export const Prop: Prop = {
         NUMBER.a+NUMBER.ROW+1,
         NUMBER.a+(NUMBER.ROW*2)
       ],
-      color: 'pink',
+      color: `rgba(${rgba[6]})`
     },
   ]
-}
-
-export const BlockPick = {
-  planA: []
 }
