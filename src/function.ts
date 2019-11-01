@@ -17,9 +17,9 @@ declare global {
 export const shuffle = Symbol('shuffle');
 
 Array.prototype.shuffle = function() {
-  return this.map(a => [a, Math.random()] )
-              .sort((a, b) => a[1] - b[1] )
-              .map(a => a[0] );
+  return this.map(a => [a, Math.random()])
+              .sort((a, b) => a[1] - b[1])
+              .map(a => a[0]);
 }
 
 export function sleep(ms: number): Promise<void> {
@@ -84,13 +84,3 @@ export function translateRectToNum(rotateMatrix: Array<number>) {
     return 0;
   }
 }
-
-export const addMultipleEventListener = (element1: Element | EventTarget | null, element2: Element | null, eventNames1: string, eventNames2: string, listener: EventListener): void => {
-  const target1 = element1 as EventTarget;
-  const target2 = element2 as EventTarget;
-  [...Array(2)].forEach(() => {
-      target1.addEventListener(eventNames1, listener, false);
-      target2.addEventListener(eventNames2, listener, false);
-    }
-  );
-};

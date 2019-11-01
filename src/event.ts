@@ -48,11 +48,16 @@ export const UserEvent =　 {
       button.square.x = Render.TouchAction.left()[0];
       button.square.y = Render.TouchAction.left()[1];
       button.square.r = Render.TouchAction.left()[2];
-      
-
+    
       if (button.hit()) {
         if(Debug.Settings.console) {
           console.log('left tapped');
+          
+          const circle = new Path2D();
+          Render.ctx.beginPath();
+          Render.ctx.fillStyle = 'rgba(255,0,0,0.7)';
+          circle.arc(button.square.x, button.square.y, button.square.r, 0, 2 * Math.PI);
+          Render.ctx.fill(circle);
         }
         return this._flag = true;
       }
@@ -153,6 +158,7 @@ export const onCanvas =　 {
   rectX: 0,
   rectY: 0,
   point: function(event: MouseEvent) {
+    this.rect = Data.canvas.getBoundingClientRect();
     const x = event.clientX - this.rect.left,
           y = event.clientY - this.rect.top;
     return this.rectX = x, this.rectY = y;

@@ -11,14 +11,14 @@ import * as Debug from './dev';
   setInterval event
 */
 
-let tabChange = false;
+// let tabChange = false;
 
-document.addEventListener('visibilitychange', ()=> {
-  // stop running expensive task
-  if (document.hidden) {
-    tabChange = true;
-  }
-});
+// document.addEventListener('visibilitychange', ()=> {
+//   // stop running expensive task
+//   if (document.hidden) {
+//     tabChange = true;
+//   }
+// });
 
 const init = function() {
 
@@ -26,9 +26,9 @@ const init = function() {
   State.Movable.pause = false;
   State.Movable.checkTime = false;
 
-  if(tabChange) {
-    return;
-  }
+  // if(tabChange) {
+  //   return;
+  // }
 
   let intervalDownMove = downMove();
 

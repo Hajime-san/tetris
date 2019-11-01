@@ -1,12 +1,12 @@
 import * as Fn from './function';
 
 export const canvas = <HTMLCanvasElement> document.getElementById('canvas');
-export const canvasWidth = canvas.width;
-export const canvasHeight = canvas.height;
+export let canvasWidth = canvas.width;
+export let canvasHeight = canvas.height;
 
 export const NUMBER = {
   ROW: 10,
-  COLUMN: 14,
+  COLUMN: 16,
   a: 4,
   DOWN_KEY: 40,
   UP_KEY: 38,

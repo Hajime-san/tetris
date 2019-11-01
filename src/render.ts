@@ -5,7 +5,7 @@ import * as Action from './event';
 import * as Debug from './dev';
 const clonedeep = require('lodash/cloneDeep');
 
-const ctx = Data.canvas.getContext('2d') as CanvasRenderingContext2D;
+export const ctx = Data.canvas.getContext('2d') as CanvasRenderingContext2D;
 // use anti-aliasing or not
 if(Debug.Settings.antiAliasing) {
   ctx.translate(0.5, 0.5);
@@ -19,7 +19,12 @@ export const GRID_SIZE = {
   STANDARD: 7,
   STEP: 27,
   QUEUE_STEP: 20,
+  getVertical: function() {
+    this.VERTICAL = this.STEP * Data.NUMBER.COLUMN;
+  },
 }
+GRID_SIZE.getVertical();
+
 
 const TEXT = {
   FONT: 'Osaka',
@@ -35,7 +40,7 @@ const TEXT = {
 }
 
 export function clearAll() {
-  ctx.clearRect(0,0,Data.canvasWidth,Data.canvasHeight);
+  ctx.clearRect(0,0,Data.canvas.width,Data.canvas.height);
 }
 
 export function clearField() {
@@ -48,20 +53,29 @@ export function clearField() {
 export function clearQueue() {
   ctx.clearRect(GRID_SIZE.HORIZON + 7,
                 0,
-                Data.canvasWidth,
-                Data.canvasHeight);
+                Data.canvas.width,
+                Data.canvas.height);
+}
+
+function fillBackGround() {
+  // background
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0,0,Data.canvas.width,Data.canvas.height);
+  ctx.fill();
 }
 
 export const Division = {
 
   start: function (callback: () => void) {
 
+    fillBackGround();
+
     ctx.font = `${TEXT.FONTSIZE2 + TEXT.FONT}`;
     ctx.fillStyle = 'rgb(255,255,255,0.9)';
     const playWdith = Math.floor(ctx.measureText(TEXT.PLAY).width);
     ctx.fillText(TEXT.PLAY,
-      (Data.canvasWidth - playWdith) / 2,
-      Data.canvasHeight / 2);
+      (Data.canvas.width - playWdith) / 2,
+      Data.canvas.height / 2);
 
     // replay button
     const play = (e: MouseEvent) => {
@@ -69,8 +83,8 @@ export const Division = {
       const button = Object.create(Action.onCanvas);
       button.point(e);
       button.figure = 'square';
-      button.square.x = (Data.canvasWidth - playWdith) / 2;
-      button.square.y = (Data.canvasHeight / 2) - 20;
+      button.square.x = (Data.canvas.width - playWdith) / 2;
+      button.square.y = (Data.canvas.height / 2) - 20;
       button.square.w = playWdith;
       button.square.h = 40;
       
@@ -101,18 +115,18 @@ export const Division = {
   
     // text
     ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.fillRect(0,0,Data.canvasWidth,Data.canvasHeight);
+    ctx.fillRect(0,0,Data.canvas.width,Data.canvas.height);
     ctx.fill();
     ctx.font = `${TEXT.FONTSIZE2 + TEXT.FONT}`;
     ctx.fillStyle = 'rgb(51,51,51,1.0)';
     const gameWdith = Math.floor(ctx.measureText(TEXT.GAMEOVER).width);
     const replayWdith = Math.floor(ctx.measureText(TEXT.REPLAY).width);
     ctx.fillText(TEXT.GAMEOVER,
-      (Data.canvasWidth - gameWdith) / 2,
-      Data.canvasHeight / 2);
+      (Data.canvas.width - gameWdith) / 2,
+      Data.canvas.height / 2);
     ctx.fillText(TEXT.REPLAY,
-      (Data.canvasWidth - replayWdith) / 2,
-      (Data.canvasHeight / 2)+40);
+      (Data.canvas.width - replayWdith) / 2,
+      (Data.canvas.height / 2)+40);
 
     // replay button
     const replay = (e: MouseEvent) => {
@@ -120,8 +134,8 @@ export const Division = {
       const button = Object.create(Action.onCanvas);
       button.point(e);
       button.figure = 'square';
-      button.square.x = (Data.canvasWidth - replayWdith) / 2;
-      button.square.y = (Data.canvasHeight / 2);
+      button.square.x = (Data.canvas.width - replayWdith) / 2;
+      button.square.y = (Data.canvas.height / 2);
       button.square.w = replayWdith;
       button.square.h = 40;
       
@@ -152,14 +166,14 @@ export const Division = {
 
 export const TouchAction = {
   _HORIZON: ((GRID_SIZE.HORIZON + (GRID_SIZE.STANDARD * 2)) / 2),
-  _CENTER: GRID_SIZE.VERTICAL + 60,
+  MARGIN_BOTTOM: 60,
   _LENGTH: 15,
 
   // left button
   left: function () {
     
     const HORIZON = this._HORIZON - (this._HORIZON / 1.4);
-    const CENTER = this._CENTER;
+    const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM;
     const LENGTH = this._LENGTH;
     const RADIANS = this._LENGTH + 5;
 
@@ -185,7 +199,7 @@ export const TouchAction = {
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     circle.arc(HORIZON + 10, CENTER, RADIANS, 0, 2 * Math.PI);
     ctx.stroke(circle);
-    
+  
     
     return [HORIZON+LENGTH,CENTER,RADIANS];
   },
@@ -193,7 +207,7 @@ export const TouchAction = {
   // right button
   right: function () {
     const HORIZON = this._HORIZON + (this._HORIZON / 1.4) - this._LENGTH;
-    const CENTER = this._CENTER;
+    const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM;
     const LENGTH = this._LENGTH;
     const RADIANS = this._LENGTH + 5;
 
@@ -226,7 +240,7 @@ export const TouchAction = {
   // down button
   down: function () {
     const HORIZON = this._HORIZON - (this._HORIZON / 3);
-    const CENTER = this._CENTER + (this._LENGTH * 3);
+    const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM + (this._LENGTH * 3);
     const LENGTH = this._LENGTH;
     const RADIANS = this._LENGTH + 5;
     
@@ -260,7 +274,7 @@ export const TouchAction = {
   // rotate button
   rotate: function () {
     const HORIZON = this._HORIZON + (this._HORIZON / 4);
-    const CENTER = this._CENTER + (this._LENGTH * 3);
+    const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM + (this._LENGTH * 3);
     const LENGTH = this._LENGTH;
     const RADIANS = this._LENGTH + 5;
     
@@ -296,15 +310,12 @@ export const TouchAction = {
 export function renderField() {
 
   // background
-  ctx.fillStyle = 'black';
-  ctx.fillRect(0,0,Data.canvasWidth,Data.canvasHeight);
-  ctx.fill();
+  fillBackGround();
 
   // line settings
   ctx.lineWidth = 1;
   ctx.strokeStyle = 'rgba(255,255,255,0.6)';
   
-
   // outline
   const outline = new Path2D();
   outline.rect(GRID_SIZE.STANDARD, GRID_SIZE.STANDARD, GRID_SIZE.HORIZON, GRID_SIZE.VERTICAL);
@@ -331,7 +342,7 @@ export function renderField() {
   TouchAction.down();
   TouchAction.rotate();
 
-  // info
+  // HUD
   ctx.font = `${TEXT.FONTSIZE + TEXT.FONT}`;
   ctx.fillStyle = 'rgb(255,255,255,0.9)';
   const nextWdith = Math.floor(ctx.measureText(TEXT.NEXT).width);
@@ -341,20 +352,24 @@ export function renderField() {
   const lineNumberWidth = Math.floor(ctx.measureText(State.Info.completedRow.toString()).width);
   
   ctx.fillText(TEXT.NEXT,
-            (GRID_SIZE.HORIZON + Data.canvasWidth - (nextWdith / 2)) / 2,
+            (GRID_SIZE.HORIZON + Data.canvas.width - (nextWdith / 2)) / 2,
             GRID_SIZE.STEP - GRID_SIZE.STANDARD);
   ctx.fillText(TEXT.LEVEL,
-            (GRID_SIZE.HORIZON + Data.canvasWidth - (levelWdith / 2)) / 2,
+            (GRID_SIZE.HORIZON + Data.canvas.width - (levelWdith / 2)) / 2,
             (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 7)) );
   ctx.fillText(State.Info.level.toString(),
-            (GRID_SIZE.HORIZON + Data.canvasWidth - (levelNumberWidth / 2)) / 2,
+            (GRID_SIZE.HORIZON + Data.canvas.width - (levelNumberWidth / 2)) / 2,
             (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 5) ) );
   ctx.fillText(TEXT.LINE,
-            (GRID_SIZE.HORIZON + Data.canvasWidth - (lineWdith / 2)) / 2,
+            (GRID_SIZE.HORIZON + Data.canvas.width - (lineWdith / 2)) / 2,
             (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 3) ) );
   ctx.fillText(State.Info.completedRow.toString(),
-            (GRID_SIZE.HORIZON + Data.canvasWidth - (lineNumberWidth / 2)) / 2,
+            (GRID_SIZE.HORIZON + Data.canvas.width - (lineNumberWidth / 2)) / 2,
             (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 1) ) );
+
+  if(Debug.Settings.console) {
+    ctx.fillText('bottom',Data.canvas.width / 2, GRID_SIZE.VERTICAL)
+  }
 }
 
 export function renderBlock(fieldArray: Data.field) {
