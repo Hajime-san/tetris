@@ -1,6 +1,6 @@
 
 export const Settings = {
-  autoMove: false,
-  console: true,
+  autoMove: true,
+  console: false,
   antiAliasing: true,
 }

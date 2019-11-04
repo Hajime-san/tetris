@@ -328,10 +328,9 @@ const init = function() {
     User input
   */
   const userActionFlow = (event: Event) => {
-    const key = event as KeyboardEvent;
-    const mouse = event as MouseEvent;
 
-    if( !key.isTrusted) {
+    // when keyboard input
+    if( !event.isTrusted) {
       return;
     }
 
@@ -340,15 +339,15 @@ const init = function() {
       return;
     }
     
-    if(Action.UserEvent.left(key) || Action.UserEvent.left(mouse)) {
+    if(Action.UserEvent.left(event)) {
       leftFlow();
     }
 
-    if(Action.UserEvent.right(key) || Action.UserEvent.right(mouse)) {
+    if(Action.UserEvent.right(event)) {
       rightFlow();
     }
 
-    if(Action.UserEvent.rotate(key) || Action.UserEvent.rotate(mouse)) {
+    if(Action.UserEvent.rotate(event)) {
       rotateFlow();
     }
 
@@ -357,7 +356,7 @@ const init = function() {
       return;
     }
     
-    if(Action.UserEvent.down(key) || Action.UserEvent.down(mouse)) {
+    if(Action.UserEvent.down(event)) {
       downFlow();
     }
 
@@ -375,8 +374,7 @@ const init = function() {
   
 }
 
-
 window.addEventListener('load', ()=> {
-  UA.resizeCanvasArea();
+  Render.resizeCanvasArea();
   Render.Division.start(init);
 });

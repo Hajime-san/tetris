@@ -11,6 +11,53 @@ if(Debug.Settings.antiAliasing) {
   ctx.translate(0.5, 0.5);
 }
 
+// check device screen size
+export const ScreenSize = {
+
+  getWidth: window.parent.screen.width,
+
+  getHeight: window.parent.screen.height,
+
+}
+
+// resize canvas size
+export function resizeCanvasArea() {
+  if(ScreenSize.getWidth > 400) {
+    Data.canvas.width = 400;
+    Data.canvas.height = 600;
+  }
+  if(ScreenSize.getHeight < 600) {
+    Data.canvas.height = Math.floor(ScreenSize.getHeight * 0.9);
+  }
+  if(ScreenSize.getWidth < 420 && ScreenSize.getWidth > 320) {
+    Data.canvas.width = ScreenSize.getWidth;
+    Data.canvas.height = 600;
+
+    GRID_SIZE.HORIZON = Math.floor(GRID_SIZE.HORIZON * 0.9);
+
+    GRID_SIZE.STEP = GRID_SIZE.HORIZON / 10;
+
+    GRID_SIZE.getVertical();
+
+    GRID_SIZE.QUEUE_STEP = GRID_SIZE.STEP - GRID_SIZE.STANDARD;
+    
+  }
+
+  if(ScreenSize.getWidth < 321) {
+    Data.canvas.width = ScreenSize.getWidth;
+
+    GRID_SIZE.HORIZON = Math.floor(GRID_SIZE.HORIZON * 0.85);
+
+    GRID_SIZE.STEP = GRID_SIZE.HORIZON / 10;
+
+    GRID_SIZE.getVertical();
+
+    GRID_SIZE.QUEUE_STEP = GRID_SIZE.STEP - GRID_SIZE.STANDARD;
+
+  }
+
+}
+
 const QueueProp: Data.Prop = clonedeep(Data.Prop);
 
 export const GRID_SIZE = {
@@ -57,9 +104,16 @@ export function clearQueue() {
                 Data.canvas.height);
 }
 
+export function clearButton() {
+  ctx.clearRect(0,
+                GRID_SIZE.VERTICAL+10,
+                Data.canvas.width,
+                Data.canvas.height);
+}
+
 function fillBackGround() {
   // background
-  ctx.fillStyle = 'black';
+  ctx.fillStyle = 'rgb(0,0,0)';
   ctx.fillRect(0,0,Data.canvas.width,Data.canvas.height);
   ctx.fill();
 }
@@ -71,11 +125,13 @@ export const Division = {
     fillBackGround();
 
     ctx.font = `${TEXT.FONTSIZE2 + TEXT.FONT}`;
-    ctx.fillStyle = 'rgb(255,255,255,0.9)';
+    ctx.fillStyle = 'rgb(255,255,255)';
     const playWdith = Math.floor(ctx.measureText(TEXT.PLAY).width);
     ctx.fillText(TEXT.PLAY,
       (Data.canvas.width - playWdith) / 2,
       Data.canvas.height / 2);
+    console.log(ctx.fillStyle);
+    
 
     // replay button
     const play = (e: MouseEvent) => {
@@ -171,7 +227,6 @@ export const TouchAction = {
 
   // left button
   left: function () {
-    
     const HORIZON = this._HORIZON - (this._HORIZON / 1.4);
     const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM;
     const LENGTH = this._LENGTH;
@@ -180,28 +235,31 @@ export const TouchAction = {
     // triangle
     const triangle = new Path2D();
     ctx.beginPath();
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
     triangle.moveTo(HORIZON + (LENGTH / 2), CENTER - (LENGTH / 3));
     triangle.lineTo(HORIZON, CENTER);
     triangle.lineTo(HORIZON + (LENGTH / 2), CENTER + (LENGTH / 3));
-    ctx.stroke(triangle);
 
     // line
     const line = new Path2D();
     ctx.beginPath();
     line.moveTo(HORIZON, CENTER);
     line.lineTo(HORIZON + (LENGTH + 5), CENTER);
-    ctx.stroke(line);
 
     // circle
     const circle = new Path2D();
     ctx.beginPath();
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
     circle.arc(HORIZON + 10, CENTER, RADIANS, 0, 2 * Math.PI);
-    ctx.stroke(circle);
   
+    function render() {
+      ctx.stroke(triangle);
+      ctx.stroke(line);
+      ctx.stroke(circle);
+    }
     
-    return [HORIZON+LENGTH,CENTER,RADIANS];
+    return {
+      render,
+      rect : [HORIZON+LENGTH,CENTER,RADIANS]
+    }
   },
 
   // right button
@@ -214,27 +272,31 @@ export const TouchAction = {
     // triangle
     const triangle = new Path2D();
     ctx.beginPath();
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
     triangle.moveTo(HORIZON + LENGTH, CENTER - (LENGTH / 3));
     triangle.lineTo(HORIZON + (LENGTH / 0.7), CENTER);
     triangle.lineTo(HORIZON + LENGTH, CENTER + (LENGTH / 3));
-    ctx.stroke(triangle);
 
     // line
     const line = new Path2D();
     ctx.beginPath();
     line.moveTo(HORIZON, CENTER);
     line.lineTo(HORIZON + (LENGTH + 5), CENTER);
-    ctx.stroke(line);
 
     // circle
     const circle = new Path2D();
     ctx.beginPath();
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
     circle.arc(HORIZON + 10, CENTER, RADIANS, 0, 2 * Math.PI);
-    ctx.stroke(circle);
     
-    return [HORIZON+LENGTH,CENTER,RADIANS];
+    function render() {
+      ctx.stroke(triangle);
+      ctx.stroke(line);
+      ctx.stroke(circle);
+    }
+    
+    return {
+      render,
+      rect : [HORIZON+LENGTH,CENTER,RADIANS]
+    }
   },
 
   // down button
@@ -243,32 +305,35 @@ export const TouchAction = {
     const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM + (this._LENGTH * 3);
     const LENGTH = this._LENGTH;
     const RADIANS = this._LENGTH + 5;
-    
 
     // triangle
     const triangle = new Path2D();
     ctx.beginPath();
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
     triangle.moveTo(HORIZON + (LENGTH / 2.7), CENTER + (LENGTH / 5));
     triangle.lineTo(HORIZON + (LENGTH / 1.5), CENTER + (LENGTH / 1.8));
     triangle.lineTo(HORIZON + (LENGTH / 1), CENTER + (LENGTH / 5));
-    ctx.stroke(triangle);
 
     // line
     const line = new Path2D();
     ctx.beginPath();
     line.moveTo(HORIZON + (LENGTH / 1.5), CENTER - (LENGTH / 1.8));
     line.lineTo(HORIZON + (LENGTH / 1.5), CENTER + (LENGTH / 1.8));
-    ctx.stroke(line);
 
     // circle
     const circle = new Path2D();
     ctx.beginPath();
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
     circle.arc(HORIZON + 10, CENTER, RADIANS, 0, 2 * Math.PI);
-    ctx.stroke(circle);
+
+    function render() {
+      ctx.stroke(triangle);
+      ctx.stroke(line);
+      ctx.stroke(circle);
+    }
     
-    return [HORIZON+LENGTH,CENTER,RADIANS];
+    return {
+      render,
+      rect : [HORIZON+LENGTH,CENTER,RADIANS]
+    }
   },
 
   // rotate button
@@ -282,27 +347,30 @@ export const TouchAction = {
     // triangle
     const triangle = new Path2D();
     ctx.beginPath();
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
     triangle.moveTo(HORIZON + (LENGTH / 1.2), CENTER - (LENGTH / 3));
     triangle.lineTo(HORIZON + (LENGTH / 0.8), CENTER);
     triangle.lineTo(HORIZON + (LENGTH / 0.6), CENTER - (LENGTH / 3));
-    ctx.stroke(triangle);
 
     // circleLine
     const circleLine = new Path2D();
     ctx.beginPath();
-    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
     circleLine.arc(HORIZON + 10, CENTER, RADIANS / 2, 0, 180);
-    ctx.stroke(circleLine);
 
     // circle
     const circle = new Path2D();
     ctx.beginPath();
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
     circle.arc(HORIZON + 10, CENTER, RADIANS, 0, 2 * Math.PI);
-    ctx.stroke(circle);
+
+    function render() {
+      ctx.stroke(triangle);
+      ctx.stroke(circleLine);
+      ctx.stroke(circle);
+    }
     
-    return [HORIZON+LENGTH,CENTER,RADIANS];
+    return {
+      render,
+      rect : [HORIZON+LENGTH,CENTER,RADIANS]
+    };
   },
   
 }
@@ -315,9 +383,11 @@ export function renderField() {
   // line settings
   ctx.lineWidth = 1;
   ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
   
   // outline
   const outline = new Path2D();
+  ctx.beginPath();
   outline.rect(GRID_SIZE.STANDARD, GRID_SIZE.STANDARD, GRID_SIZE.HORIZON, GRID_SIZE.VERTICAL);
   ctx.stroke(outline);
 
@@ -326,25 +396,26 @@ export function renderField() {
 
   // horizon line
   for (let i = GRID_SIZE.STEP + GRID_SIZE.STANDARD; i < GRID_SIZE.VERTICAL; i += GRID_SIZE.STEP){
+    ctx.beginPath();
     grid.moveTo(GRID_SIZE.STANDARD, i);
     grid.lineTo(GRID_SIZE.HORIZON + GRID_SIZE.STANDARD, i);
   }
   // vertical line
   for (let i = GRID_SIZE.STEP + GRID_SIZE.STANDARD; i < GRID_SIZE.HORIZON; i += GRID_SIZE.STEP){
+    ctx.beginPath();
     grid.moveTo(i, GRID_SIZE.STANDARD);
     grid.lineTo(i, GRID_SIZE.VERTICAL + GRID_SIZE.STANDARD);
   }
   ctx.stroke(grid);
 
   // touch button
-  TouchAction.left();
-  TouchAction.right();
-  TouchAction.down();
-  TouchAction.rotate();
+  TouchAction.left().render();
+  TouchAction.right().render();
+  TouchAction.down().render();
+  TouchAction.rotate().render();  
 
   // HUD
   ctx.font = `${TEXT.FONTSIZE + TEXT.FONT}`;
-  ctx.fillStyle = 'rgb(255,255,255,0.9)';
   const nextWdith = Math.floor(ctx.measureText(TEXT.NEXT).width);
   const levelWdith = Math.floor(ctx.measureText(TEXT.LEVEL).width);
   const lineWdith = Math.floor(ctx.measureText(TEXT.LINE).width);
@@ -353,7 +424,7 @@ export function renderField() {
   
   ctx.fillText(TEXT.NEXT,
             (GRID_SIZE.HORIZON + Data.canvas.width - (nextWdith / 2)) / 2,
-            GRID_SIZE.STEP - GRID_SIZE.STANDARD);
+            GRID_SIZE.STEP);
   ctx.fillText(TEXT.LEVEL,
             (GRID_SIZE.HORIZON + Data.canvas.width - (levelWdith / 2)) / 2,
             (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 7)) );
@@ -370,6 +441,7 @@ export function renderField() {
   if(Debug.Settings.console) {
     ctx.fillText('bottom',Data.canvas.width / 2, GRID_SIZE.VERTICAL)
   }
+
 }
 
 export function renderBlock(fieldArray: Data.field) {
