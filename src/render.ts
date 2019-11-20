@@ -125,12 +125,11 @@ export const Division = {
     fillBackGround();
 
     ctx.font = `${TEXT.FONTSIZE2 + TEXT.FONT}`;
-    ctx.fillStyle = 'rgb(255,255,255)';
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
     const playWdith = Math.floor(ctx.measureText(TEXT.PLAY).width);
     ctx.fillText(TEXT.PLAY,
       (Data.canvas.width - playWdith) / 2,
       Data.canvas.height / 2);
-    console.log(ctx.fillStyle);
     
 
     // replay button
@@ -174,7 +173,7 @@ export const Division = {
     ctx.fillRect(0,0,Data.canvas.width,Data.canvas.height);
     ctx.fill();
     ctx.font = `${TEXT.FONTSIZE2 + TEXT.FONT}`;
-    ctx.fillStyle = 'rgb(51,51,51,1.0)';
+    ctx.fillStyle = 'rgba(51,51,51,1.0)';
     const gameWdith = Math.floor(ctx.measureText(TEXT.GAMEOVER).width);
     const replayWdith = Math.floor(ctx.measureText(TEXT.REPLAY).width);
     ctx.fillText(TEXT.GAMEOVER,
@@ -224,13 +223,14 @@ export const TouchAction = {
   _HORIZON: ((GRID_SIZE.HORIZON + (GRID_SIZE.STANDARD * 2)) / 2),
   MARGIN_BOTTOM: 60,
   _LENGTH: 15,
+  _RADIANS: 5,
 
   // left button
   left: function () {
     const HORIZON = this._HORIZON - (this._HORIZON / 1.4);
     const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM;
     const LENGTH = this._LENGTH;
-    const RADIANS = this._LENGTH + 5;
+    const RADIANS = this._LENGTH + this._RADIANS;
 
     // triangle
     const triangle = new Path2D();
@@ -258,7 +258,7 @@ export const TouchAction = {
     
     return {
       render,
-      rect : [HORIZON+LENGTH,CENTER,RADIANS]
+      rect : [(HORIZON+LENGTH) - this._RADIANS,CENTER,RADIANS]
     }
   },
 
@@ -267,7 +267,7 @@ export const TouchAction = {
     const HORIZON = this._HORIZON + (this._HORIZON / 1.4) - this._LENGTH;
     const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM;
     const LENGTH = this._LENGTH;
-    const RADIANS = this._LENGTH + 5;
+    const RADIANS = this._LENGTH + this._RADIANS;
 
     // triangle
     const triangle = new Path2D();
@@ -295,16 +295,16 @@ export const TouchAction = {
     
     return {
       render,
-      rect : [HORIZON+LENGTH,CENTER,RADIANS]
+      rect : [(HORIZON+LENGTH) - this._RADIANS,CENTER,RADIANS]
     }
   },
 
   // down button
   down: function () {
-    const HORIZON = this._HORIZON - (this._HORIZON / 3);
+    const HORIZON = this._HORIZON - (this._HORIZON / 2.5);
     const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM + (this._LENGTH * 3);
     const LENGTH = this._LENGTH;
-    const RADIANS = this._LENGTH + 5;
+    const RADIANS = this._LENGTH + this._RADIANS;
 
     // triangle
     const triangle = new Path2D();
@@ -332,16 +332,55 @@ export const TouchAction = {
     
     return {
       render,
-      rect : [HORIZON+LENGTH,CENTER,RADIANS]
+      rect : [(HORIZON+LENGTH) - this._RADIANS,CENTER,RADIANS]
+    }
+  },
+
+  // down button
+  hardDown: function () {
+    const HORIZON = this._HORIZON;
+    const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM + (this._LENGTH * 3);
+    const LENGTH = this._LENGTH;
+    const RADIANS = this._LENGTH + this._RADIANS;
+
+    // triangle
+    const triangle = new Path2D();
+    ctx.beginPath();
+    triangle.moveTo(HORIZON + (LENGTH / 2.7), CENTER + (LENGTH / 5));
+    triangle.lineTo(HORIZON + (LENGTH / 1.5), CENTER + (LENGTH / 1.8));
+    triangle.lineTo(HORIZON + (LENGTH / 1), CENTER + (LENGTH / 5));
+
+    // triangle2
+    const triangle2 = new Path2D();
+    ctx.beginPath();
+    triangle2.moveTo(HORIZON + (LENGTH / 2.7), CENTER + (LENGTH / 9));
+    triangle2.lineTo(HORIZON + (LENGTH / 1.5), CENTER + (LENGTH / 5.8));
+    triangle2.lineTo(HORIZON + (LENGTH / 1), CENTER + (LENGTH / 9));
+    
+
+    // circle
+    const circle = new Path2D();
+    ctx.beginPath();
+    circle.arc(HORIZON + 10, CENTER, RADIANS, 0, 2 * Math.PI);
+
+    function render() {
+      ctx.stroke(triangle);
+      ctx.stroke(triangle2);
+      ctx.stroke(circle);
+    }
+    
+    return {
+      render,
+      rect : [(HORIZON+LENGTH) - this._RADIANS,CENTER,RADIANS]
     }
   },
 
   // rotate button
   rotate: function () {
-    const HORIZON = this._HORIZON + (this._HORIZON / 4);
+    const HORIZON = this._HORIZON + (this._HORIZON / 2.5);
     const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM + (this._LENGTH * 3);
     const LENGTH = this._LENGTH;
-    const RADIANS = this._LENGTH + 5;
+    const RADIANS = this._LENGTH + this._RADIANS;
     
 
     // triangle
@@ -369,7 +408,7 @@ export const TouchAction = {
     
     return {
       render,
-      rect : [HORIZON+LENGTH,CENTER,RADIANS]
+      rect : [(HORIZON+LENGTH) - this._RADIANS,CENTER,RADIANS]
     };
   },
   
@@ -412,6 +451,7 @@ export function renderField() {
   TouchAction.left().render();
   TouchAction.right().render();
   TouchAction.down().render();
+  TouchAction.hardDown().render();
   TouchAction.rotate().render();  
 
   // HUD

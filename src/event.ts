@@ -1,4 +1,5 @@
 import * as UA from './ua';
+import * as Fn from './function';
 import * as Data from './data';
 import * as Debug from './dev';
 import * as Render from './render';
@@ -88,16 +89,17 @@ export const UserEvent =　 {
       button.square.x = Render.TouchAction.left().rect[0];
       button.square.y = Render.TouchAction.left().rect[1];
       button.square.r = Render.TouchAction.left().rect[2];
+      
     
       if (button.hit()) {
         if(Debug.Settings.console) {
           console.log('left tapped');
           
-          const circle = new Path2D();
-          Render.ctx.beginPath();
-          Render.ctx.fillStyle = 'rgba(255,0,0,0.7)';
-          circle.arc(button.square.x, button.square.y, button.square.r, 0, 2 * Math.PI);
-          Render.ctx.fill(circle);
+          // const circle = new Path2D();
+          // Render.ctx.beginPath();
+          // Render.ctx.fillStyle = 'rgba(255,0,0,0.7)';
+          // circle.arc(button.square.x, button.square.y, button.square.r, 0, 2 * Math.PI);
+          // Render.ctx.fill(circle);
         }
         return this._flag = true;
       }
@@ -168,6 +170,37 @@ export const UserEvent =　 {
     if (key.keyCode === Data.NUMBER.DOWN_KEY) {
       if(Debug.Settings.console) {
         console.log('down inputted');
+      }
+      return this._flag = true;
+    }
+    return this._flag = false;
+  },
+
+  hardDown: function(event: Event) {
+    // when touch device
+    if(UA.isTouchEnabled()) {
+      const mouse = event as MouseEvent;
+      // crate hit area
+      const button = Object.create(onCanvas);
+      button.point(mouse);
+      button.figure = 'circle';
+      button.square.x = Render.TouchAction.hardDown().rect[0];
+      button.square.y = Render.TouchAction.hardDown().rect[1];
+      button.square.r = Render.TouchAction.hardDown().rect[2];
+      
+      if (button.hit()) {
+        if(Debug.Settings.console) {
+          console.log('hard down tapped');
+        }
+        return this._flag = true;
+      }
+      return this._flag = false;
+    }
+
+    const key = event as KeyboardEvent;
+    if (key.keyCode === Data.NUMBER.HARD_DOWN_KEY) {
+      if(Debug.Settings.console) {
+        console.log('hard down inputted');
       }
       return this._flag = true;
     }

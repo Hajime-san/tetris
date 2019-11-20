@@ -117,10 +117,12 @@ export const Movable = {
     return this._flag;
   },
 
+
   // check rotatable
   rotate: function(fieldArray: Data.field, currentBlock: Array<number>, copyBlock: Array<number>, blockNumber: number) {
     let leftWall = true;
     let rightWall = true;
+    let downWall = true;
 
     const angle = Block.angle + Data.NUMBER.DEGREES;
     const tmpBlock = rotatedBlock(copyBlock, angle, true, Block.blockNumber);
@@ -128,11 +130,24 @@ export const Movable = {
     
     // wall check left/right
     currentBlock.forEach((v)=>{
+      const isLastRow = fieldArray.some(some => v >= fieldArray.length - Data.NUMBER.ROW);
+      if(isLastRow) {
+        downWall = false;
+      }
       if(Fn.fixToFirstDigit(v) === Fn.fixToFirstDigit(Data.NUMBER.ROW)) {
         leftWall = false;
       }
       if(Fn.fixToFirstDigit(v) === Fn.fixToFirstDigit(Data.NUMBER.ROW + Data.NUMBER.LEFT_MOVE)) {
         rightWall = false;
+      }
+    })
+
+    // wall down check
+    // check last row
+    currentBlock.forEach((v) => {
+      const isLastRow = fieldArray.some(some => v >= fieldArray.length - Data.NUMBER.ROW);
+      if(isLastRow) {
+        downWall = false;
       }
     })
 
@@ -149,9 +164,11 @@ export const Movable = {
         }
       })
     })
+
+
     
     
-    if( !leftWall && !rightWall || !isFilled ) {  
+    if( !leftWall && !rightWall || !downWall || !isFilled ) {  
       if(Debug.Settings.console) {
         console.log('cant rotate');
       }
@@ -162,9 +179,6 @@ export const Movable = {
     return this._flag;
   },
 
-  All: function() {
-    this.rotate, this.left, this.right, this.down;
-  },
 
   _pause: false,
   get pause () { return this._pause; },

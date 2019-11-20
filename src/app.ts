@@ -184,6 +184,23 @@ const init = function() {
     }
   }
 
+  // hard down posibility check && hard down input check
+  function hardDownFlow() {
+    while(State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number)) {
+      Controll.Update.clear(State.Block.current, Controll.Update.field);
+      Controll.Direction.down(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number);
+      Controll.Update.transfer(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number, Controll.Update.field);
+      State.Block.current = State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number; 
+    }
+    
+    Render.clearField();
+    Render.clearQueue();
+    Render.renderField();
+    Render.renderQueue(Controll.Update.queueField);
+    Render.renderBlock(Controll.Update.field);
+    
+  }
+
   // left posibility check
   function leftFlow() {
     if(State.Movable.left(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) ) {
@@ -358,6 +375,10 @@ const init = function() {
     
     if(Action.UserEvent.down(event)) {
       downFlow();
+    }
+
+    if(Action.UserEvent.hardDown(event)) {
+      hardDownFlow();
     }
 
     completeRowFlow();

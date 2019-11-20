@@ -9,6 +9,7 @@ export const NUMBER = {
   COLUMN: 16,
   a: 4,
   DOWN_KEY: 40,
+  HARD_DOWN_KEY: 90,
   UP_KEY: 38,
   LEFT_KEY: 37,
   RIGHT_KEY: 39,
