@@ -484,6 +484,22 @@ export function renderField() {
 
 }
 
+export function clearBlock(fieldArray: Data.field) {
+
+  fieldArray.forEach((v,i)=>{
+    if(v === Data.STRING.EMPTY) {
+      return;
+    }
+
+    // draw controllable block
+    if(v === Data.STRING.CURRENT) {
+      ctx.clearRect((Fn.fixToFirstDigit(i) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
+                  (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
+                                        GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
+    }
+  })
+}
+
 export function renderBlock(fieldArray: Data.field) {
 
   fieldArray.forEach((v,i)=>{
@@ -498,9 +514,9 @@ export function renderBlock(fieldArray: Data.field) {
                   (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
                                         GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
       ctx.fill();
+    }
 
     // draw fixed block
-    }
     if (v !== Data.STRING.CURRENT && typeof v === 'number') {
       ctx.fillStyle = State.Block.deepCopy.BLOCKS[v].color;
       ctx.fillRect((Fn.fixToFirstDigit(i) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),

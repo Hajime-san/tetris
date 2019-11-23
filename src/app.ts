@@ -172,14 +172,16 @@ const init = function() {
   function downFlow() {
     if(State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number)) {
       
+      
+      Render.clearBlock(Controll.Update.field);
       Controll.Update.clear(State.Block.current, Controll.Update.field);
       Controll.Direction.down(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number);
       Controll.Update.transfer(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number, Controll.Update.field);
       State.Block.current = State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number;
-      Render.clearField();
-      Render.clearQueue();
-      Render.renderField();
-      Render.renderQueue(Controll.Update.queueField);
+      //Render.clearField();
+      //Render.clearQueue();
+      //Render.renderField();
+      //Render.renderQueue(Controll.Update.queueField);
       Render.renderBlock(Controll.Update.field);
     }
   }
