@@ -6,3 +6,6 @@ main {
     display: flex;
     justify-content: center;
 }
+#canvas {
+    -webkit-tap-highlight-color: transparent; 
+}
