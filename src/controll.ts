@@ -1,30 +1,17 @@
 import * as Data from './data';
 import * as Fn from './function';
 import * as State from './state';
-const clonedeep = require('lodash/cloneDeep');
 
 export const Direction = {
   left: (block: Array<number>) => {
-    block.forEach((_,i,arr)=>{
-      arr[i] += Data.NUMBER.LEFT_MOVE;
-    })
+    return block.map(v=> v += Data.NUMBER.LEFT_MOVE);
   },
   right: (block: Array<number>) => {
-    block.forEach((_,i,arr)=>{
-      arr[i] += Data.NUMBER.RIGHT_MOVE;
-    })
+    return block.map(v=> v += Data.NUMBER.RIGHT_MOVE);
   },
   down: (block: Array<number>) => {
-    block.forEach((_,i,arr)=>{
-      arr[i] += Data.NUMBER.ROW;
-    })
+    return block.map(v=> v += Data.NUMBER.ROW);
   },
-  rotate: (block: Array<number>) => {
-    block.forEach((_,i,arr)=>{
-      arr[i] += 0;
-    })
-  },
-
 }
 
 
@@ -46,7 +33,6 @@ interface Update {
   transferToFix: (fieldArray: Data.field) => void;
   transfer: (block: Array<number>, fieldArray: Data.field) => void;
   clear: (current: Array<number>, fieldArray: Data.field) => void;
-  reGenerateBlock: () => Data.Prop;
 }
 
 export const Update: Update = {
@@ -213,7 +199,4 @@ export const Update: Update = {
     current.forEach((v) => fieldArray[v] = Data.STRING.EMPTY );
   },
 
-  reGenerateBlock: () => {
-    return clonedeep(Data.Prop);
-  }
 }

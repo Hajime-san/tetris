@@ -1,10 +1,13 @@
 body {
     margin: 0;
+    height: 100vh;
     background-color: #000;
 }
 main {
-    display: flex;
-    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 #canvas {
     -webkit-tap-highlight-color: transparent; 

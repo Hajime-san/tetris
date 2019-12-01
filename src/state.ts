@@ -2,7 +2,6 @@ import * as Fn from './function';
 import * as Data from './data';
 import * as Controll from './controll';
 import * as Debug from './dev';
-const clonedeep = require('lodash/cloneDeep');
 
 /**
  * Chceck movable flags
@@ -311,7 +310,7 @@ interface Block {
 // mutable objects
 export const Block: Block = {
 
-  deepCopy : clonedeep(Data.Prop),
+  deepCopy : Object.create(Data.Prop),
 
   get blockNumber () {
     return blockQueue.queue[0];
@@ -496,7 +495,7 @@ export const Info = {
 
   speed: 1000,
   level: 0,
-  n: 10,
+  multipleNumber: 10,
 
   incrementLevelandSpeed: function() {
     const N = 10;
@@ -504,9 +503,9 @@ export const Info = {
       return
     }
     
-    if((this.completedRow % this.n) < 4 && (this.completedRow / this.n) >= 1) {
+    if((this.completedRow % this.multipleNumber) < 4 && (this.completedRow / this.multipleNumber) >= 1) {
       if(this.speed >= 100) {
-        this.n += N;
+        this.multipleNumber += N;
         this.speed -= 100;
       }
       return this.level += 1;
@@ -514,7 +513,34 @@ export const Info = {
   },
   resetLevelandSpeed: function() {
     return this.level = 0, this.speed = 1000;
-  }
+  },
+
+  _score: 0,
+  incrementScore: function() {
+
+    // fail to complete row
+    if(Controll.Update.completeRowNumbers.length === 0) {
+      this._score += 10;
+    }
+
+    if(Controll.Update.completeRowNumbers.length < 1) {
+      return
+    }
+
+    // success to complete row
+    let ratio = 1;
+    let multple = 0;
+    Controll.Update.completeRowNumbers.map((v,i)=>{
+      let increment = 50;
+      multple += 0.2;
+      ratio *= 1.2 + multple;
+      this._score += Math.floor(increment * ratio);
+    })
+  },
+
+  resetScore: function() {
+    this._score = 0;
+  },
 
 }
 
@@ -524,7 +550,7 @@ export const Playable = {
   _flag: true,
   continue: function(fieldArray: Data.field) {
     fieldArray.forEach((_,__,arr)=>{
-      Data.Prop.BLOCKS[blockQueue.queue[1]].number.forEach((w,j,arr2)=>{
+      Data.Prop.BLOCKS[blockQueue.queue[1]].number.forEach((w)=>{
         if(typeof arr[w] === 'number') {
           this._flag = false;
         } else {

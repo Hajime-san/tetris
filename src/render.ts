@@ -1,9 +1,10 @@
 import * as Data from './data';
 import * as Fn from './function';
+import * as UA from './ua';
 import * as State from './state';
 import * as Action from './event';
 import * as Debug from './dev';
-const clonedeep = require('lodash/cloneDeep');
+import * as Controll from './controll';
 
 export const ctx = Data.canvas.getContext('2d') as CanvasRenderingContext2D;
 // use anti-aliasing or not
@@ -58,8 +59,6 @@ export function resizeCanvasArea() {
 
 }
 
-const QueueProp: Data.Prop = clonedeep(Data.Prop);
-
 export const GRID_SIZE = {
   HORIZON: 270,
   VERTICAL: 378,
@@ -79,7 +78,7 @@ const TEXT = {
   FONTSIZE2: '18px ',
   NEXT: 'Next',
   LINE: 'Line',
-  LEVEL: 'Level',
+  SCORE: 'Score',
   PLAY: 'Play ?',
   GAMEOVER: 'Game Over',
   REPLAY: 'Replay ?',
@@ -90,26 +89,6 @@ export function clearAll() {
   ctx.clearRect(0,0,Data.canvas.width,Data.canvas.height);
 }
 
-export function clearField() {
-  ctx.clearRect(GRID_SIZE.STANDARD - 7,
-                GRID_SIZE.STANDARD - 7,
-                GRID_SIZE.HORIZON+10,
-                GRID_SIZE.VERTICAL+10);
-}
-
-export function clearQueue() {
-  ctx.clearRect(GRID_SIZE.HORIZON + 7,
-                0,
-                Data.canvas.width,
-                Data.canvas.height);
-}
-
-export function clearButton() {
-  ctx.clearRect(0,
-                GRID_SIZE.VERTICAL+10,
-                Data.canvas.width,
-                Data.canvas.height);
-}
 
 function fillBackGround() {
   // background
@@ -220,15 +199,15 @@ export const Division = {
 }
 
 export const TouchAction = {
-  _HORIZON: ((GRID_SIZE.HORIZON + (GRID_SIZE.STANDARD * 2)) / 2),
-  MARGIN_BOTTOM: 60,
+  _MARGIN_BOTTOM: 60,
   _LENGTH: 15,
   _RADIANS: 5,
 
   // left button
   left: function () {
-    const HORIZON = this._HORIZON - (this._HORIZON / 1.4);
-    const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM;
+    
+    const HORIZON = Data.canvas.width / 2 - (Data.canvas.width / 2 - this._LENGTH * 2);
+    const CENTER = GRID_SIZE.VERTICAL + this._MARGIN_BOTTOM;
     const LENGTH = this._LENGTH;
     const RADIANS = this._LENGTH + this._RADIANS;
 
@@ -264,8 +243,8 @@ export const TouchAction = {
 
   // right button
   right: function () {
-    const HORIZON = this._HORIZON + (this._HORIZON / 1.4) - this._LENGTH;
-    const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM;
+    const HORIZON = Data.canvas.width / 2 + (Data.canvas.width / 2 - this._LENGTH * 3);
+    const CENTER = GRID_SIZE.VERTICAL + this._MARGIN_BOTTOM;
     const LENGTH = this._LENGTH;
     const RADIANS = this._LENGTH + this._RADIANS;
 
@@ -301,8 +280,8 @@ export const TouchAction = {
 
   // down button
   down: function () {
-    const HORIZON = this._HORIZON - (this._HORIZON / 2.5);
-    const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM + (this._LENGTH * 3);
+    const HORIZON = Data.canvas.width / 2 - (Data.canvas.width / 2 / 2.5);
+    const CENTER = GRID_SIZE.VERTICAL + this._MARGIN_BOTTOM + (this._LENGTH * 3);
     const LENGTH = this._LENGTH;
     const RADIANS = this._LENGTH + this._RADIANS;
 
@@ -338,8 +317,8 @@ export const TouchAction = {
 
   // down button
   hardDown: function () {
-    const HORIZON = this._HORIZON;
-    const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM + (this._LENGTH * 3);
+    const HORIZON = Data.canvas.width / 2;
+    const CENTER = GRID_SIZE.VERTICAL + this._MARGIN_BOTTOM + (this._LENGTH * 3);
     const LENGTH = this._LENGTH;
     const RADIANS = this._LENGTH + this._RADIANS;
 
@@ -377,8 +356,8 @@ export const TouchAction = {
 
   // rotate button
   rotate: function () {
-    const HORIZON = this._HORIZON + (this._HORIZON / 2.5);
-    const CENTER = GRID_SIZE.VERTICAL + this.MARGIN_BOTTOM + (this._LENGTH * 3);
+    const HORIZON = Data.canvas.width / 2 + (Data.canvas.width / 2 / 2.5);
+    const CENTER = GRID_SIZE.VERTICAL + this._MARGIN_BOTTOM + (this._LENGTH * 3);
     const LENGTH = this._LENGTH;
     const RADIANS = this._LENGTH + this._RADIANS;
     
@@ -448,28 +427,30 @@ export function renderField() {
   ctx.stroke(grid);
 
   // touch button
-  TouchAction.left().render();
-  TouchAction.right().render();
-  TouchAction.down().render();
-  TouchAction.hardDown().render();
-  TouchAction.rotate().render();  
+  if(UA.isTouchEnabled()) {
+    TouchAction.left().render();
+    TouchAction.right().render();
+    TouchAction.down().render();
+    TouchAction.hardDown().render();
+    TouchAction.rotate().render();
+  }
 
   // HUD
   ctx.font = `${TEXT.FONTSIZE + TEXT.FONT}`;
   const nextWdith = Math.floor(ctx.measureText(TEXT.NEXT).width);
-  const levelWdith = Math.floor(ctx.measureText(TEXT.LEVEL).width);
+  const scoreWdith = Math.floor(ctx.measureText(TEXT.SCORE).width);
   const lineWdith = Math.floor(ctx.measureText(TEXT.LINE).width);
-  const levelNumberWidth = Math.floor(ctx.measureText(State.Info.level.toString()).width);
+  const scoreNumberWidth = Math.floor(ctx.measureText(State.Info._score.toString()).width);
   const lineNumberWidth = Math.floor(ctx.measureText(State.Info.completedRow.toString()).width);
   
   ctx.fillText(TEXT.NEXT,
             (GRID_SIZE.HORIZON + Data.canvas.width - (nextWdith / 2)) / 2,
             GRID_SIZE.STEP);
-  ctx.fillText(TEXT.LEVEL,
-            (GRID_SIZE.HORIZON + Data.canvas.width - (levelWdith / 2)) / 2,
+  ctx.fillText(TEXT.SCORE,
+            (GRID_SIZE.HORIZON + Data.canvas.width - (scoreWdith / 2)) / 2,
             (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 7)) );
-  ctx.fillText(State.Info.level.toString(),
-            (GRID_SIZE.HORIZON + Data.canvas.width - (levelNumberWidth / 2)) / 2,
+  ctx.fillText(State.Info._score.toString(),
+            (GRID_SIZE.HORIZON + Data.canvas.width - (scoreNumberWidth / 2)) / 2,
             (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 5) ) );
   ctx.fillText(TEXT.LINE,
             (GRID_SIZE.HORIZON + Data.canvas.width - (lineWdith / 2)) / 2,
@@ -477,10 +458,6 @@ export function renderField() {
   ctx.fillText(State.Info.completedRow.toString(),
             (GRID_SIZE.HORIZON + Data.canvas.width - (lineNumberWidth / 2)) / 2,
             (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 1) ) );
-
-  if(Debug.Settings.console) {
-    ctx.fillText('bottom',Data.canvas.width / 2, GRID_SIZE.VERTICAL)
-  }
 
 }
 
@@ -497,6 +474,39 @@ export function clearBlock(fieldArray: Data.field) {
                   (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
                                         GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
     }
+  })
+}
+
+export function deleteCompletedBlock(fieldArray: Data.field) {
+
+  return new Promise<void>((resolve) => {
+    //let timeDelay = 0;
+    //let fasterTime = -(Controll.Update.completeRowNumbers.length * 10);
+    Controll.Update.completeRowNumbers.forEach((v,_,arr)=>{
+      [...Array(Data.NUMBER.ROW)].forEach((_,itelator)=>{
+        let i = v * Data.NUMBER.ROW + itelator;
+
+        if (i >= ((arr[arr.length - 1] * Data.NUMBER.ROW) + (Data.NUMBER.ROW - 1) ) ) {
+          resolve();
+        }
+
+        ctx.clearRect((Fn.fixToFirstDigit(i) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
+                    (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
+                                          GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
+
+        // setTimeout(()=>{
+        //   const clearSequence = setInterval(()=> {
+        //     ctx.clearRect((Fn.fixToFirstDigit(i) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
+        //               (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
+        //                                     GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
+        //  }, 50);
+          
+        // }, timeDelay)
+        // timeDelay += 50 + fasterTime;
+      })
+    })
+    
+    
   })
 }
 
@@ -529,6 +539,8 @@ export function renderBlock(fieldArray: Data.field) {
 
 export function renderQueue(queue: Data.field) {
 
+  const QueueProp = Object.create(Data.Prop);
+
   // only one block to pick
   //const num = State.blockQueue.queue[1];
   //const block = State.rotatedBlock(QueueProp.BLOCKS[num].number, angle, false, num);
@@ -542,7 +554,7 @@ export function renderQueue(queue: Data.field) {
     let start = 0;
     let temp = State.rotatedBlock(QueueProp.BLOCKS[v].number, angle, false, v);
 
-    // fix positions
+    // fix horizontal position
     if(v === 0) {
       angle = 0;
     }
@@ -570,7 +582,7 @@ export function renderQueue(queue: Data.field) {
       temp.forEach((_,i,arr) => { arr[i] -= 1 })
     }
   
-    
+    // fix vertical position 
     if( i === 0) {
       temp.forEach(w => queue[w] = v);
     }

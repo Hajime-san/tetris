@@ -1,5 +1,4 @@
 import * as UA from './ua';
-import * as Fn from './function';
 import * as Data from './data';
 import * as Debug from './dev';
 import * as Render from './render';

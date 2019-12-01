@@ -43,7 +43,7 @@ const init = function() {
   function downCheck() {
     if(Debug.Settings.autoMove) {
       return window.setInterval(()=>{
-        if(State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) ) {
+        if(State.Movable.down(Controll.Update.field, State.Block.current) ) {
           return;
         }
         clearInterval(intervalDownMove);
@@ -97,6 +97,8 @@ const init = function() {
     State.Info.incrementCount();
     // increment level
     State.Info.incrementLevelandSpeed();
+    // increment score
+    State.Info.incrementScore();
 
     // game over
     if( !State.Playable.continue(Controll.Update.field)) {
@@ -124,9 +126,6 @@ const init = function() {
       return;
     }
 
-    // reset block
-    const reset = Controll.Update.reGenerateBlock();
-    State.Block.deepCopy = reset;
     // reset angle
     State.Block.resetAngle();
     // reset completed row numbers
@@ -170,51 +169,41 @@ const init = function() {
 
   // down posibility check && down input check
   function downFlow() {
-    if(State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number)) {
-      
+    if(State.Movable.down(Controll.Update.field, State.Block.current)) {
       
       Render.clearBlock(Controll.Update.field);
+
       Controll.Update.clear(State.Block.current, Controll.Update.field);
-      Controll.Direction.down(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number);
-      Controll.Update.transfer(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number, Controll.Update.field);
-      State.Block.current = State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number;
-      //Render.clearField();
-      //Render.clearQueue();
-      //Render.renderField();
-      //Render.renderQueue(Controll.Update.queueField);
+      Controll.Update.transfer(Controll.Direction.down(State.Block.current), Controll.Update.field);
+      State.Block.current = Controll.Direction.down(State.Block.current);
+
       Render.renderBlock(Controll.Update.field);
     }
   }
 
   // hard down posibility check && hard down input check
   function hardDownFlow() {
-    while(State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number)) {
+    Render.clearBlock(Controll.Update.field);
+    while(State.Movable.down(Controll.Update.field, State.Block.current)) {
       Controll.Update.clear(State.Block.current, Controll.Update.field);
-      Controll.Direction.down(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number);
-      Controll.Update.transfer(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number, Controll.Update.field);
-      State.Block.current = State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number; 
+      Controll.Update.transfer(Controll.Direction.down(State.Block.current), Controll.Update.field);
+      State.Block.current = Controll.Direction.down(State.Block.current);
     }
     
-    Render.clearField();
-    Render.clearQueue();
-    Render.renderField();
-    Render.renderQueue(Controll.Update.queueField);
     Render.renderBlock(Controll.Update.field);
     
   }
 
   // left posibility check
   function leftFlow() {
-    if(State.Movable.left(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) ) {
+    if(State.Movable.left(Controll.Update.field, State.Block.current) ) {
+
+      Render.clearBlock(Controll.Update.field);
 
       Controll.Update.clear(State.Block.current, Controll.Update.field);
-      Controll.Direction.left(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number);
-      Controll.Update.transfer(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number, Controll.Update.field);
-      State.Block.current = State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number;
-      Render.clearField();
-      Render.clearQueue();
-      Render.renderField();
-      Render.renderQueue(Controll.Update.queueField);
+      Controll.Update.transfer(Controll.Direction.left(State.Block.current), Controll.Update.field);
+      State.Block.current = Controll.Direction.left(State.Block.current);
+
       Render.renderBlock(Controll.Update.field);
 
     }
@@ -222,16 +211,14 @@ const init = function() {
 
   // right posibility check
   function rightFlow() {
-    if(State.Movable.right(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) ) {
+    if(State.Movable.right(Controll.Update.field, State.Block.current) ) {
+
+      Render.clearBlock(Controll.Update.field);
 
       Controll.Update.clear(State.Block.current, Controll.Update.field);
-      Controll.Direction.right(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number);
-      Controll.Update.transfer(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number, Controll.Update.field);
-      State.Block.current = State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number;
-      Render.clearField();
-      Render.clearQueue();
-      Render.renderField();
-      Render.renderQueue(Controll.Update.queueField);
+      Controll.Update.transfer(Controll.Direction.right(State.Block.current), Controll.Update.field);
+      State.Block.current = Controll.Direction.right(State.Block.current);
+
       Render.renderBlock(Controll.Update.field);
 
     }
@@ -241,20 +228,16 @@ const init = function() {
   function rotateFlow() {
     if(State.Movable.rotate(Controll.Update.field,
       State.rotatedBlock(State.Block.current, State.Block.angle, true, State.Block.blockNumber),
-      State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number, State.Block.blockNumber)) {
+      State.Block.current, State.Block.blockNumber)) {
 
       State.Block.angle = Data.NUMBER.DEGREES;
+
+      Render.clearBlock(Controll.Update.field);
       
       Controll.Update.clear(State.Block.current, Controll.Update.field);
-      Controll.Direction.rotate(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number);
       State.Block.current = State.rotatedBlock(State.Block.current, State.Block.angle, true,  State.Block.blockNumber);
-      State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number = State.Block.current;
-      Controll.Update.transfer(State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number, Controll.Update.field);
+      Controll.Update.transfer(State.Block.current, Controll.Update.field);
       
-      Render.clearField();
-      Render.clearQueue();
-      Render.renderField();
-      Render.renderQueue(Controll.Update.queueField);
       Render.renderBlock(Controll.Update.field);
 
     }
@@ -263,7 +246,7 @@ const init = function() {
   // down failed & row complete
   function completeRowFlow() {
     
-    if( !State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) &&
+    if( !State.Movable.down(Controll.Update.field, State.Block.current) &&
     State.Complete.check(Controll.Update.field)) {
       // stop user action
       State.Movable.pause = true;
@@ -278,19 +261,12 @@ const init = function() {
         // delete row rendering
         Controll.Update.deleteRow(Controll.Update.field);
         State.Info.incrementCompletedRow();
-        Render.clearField();
-        Render.clearQueue();
-        Render.renderField();
-        Render.renderQueue(Controll.Update.queueField);
-        Render.renderBlock(Controll.Update.field);
+        await Render.deleteCompletedBlock(Controll.Update.field);
 
         await Fn.sleep(500);
+
         // drop row rendering
         Controll.Update.dropRow(Controll.Update.field);
-        Render.clearField();
-        Render.clearQueue();
-        Render.renderField();
-        Render.renderQueue(Controll.Update.queueField);
         Render.renderBlock(Controll.Update.field);
         Controll.Update.transferToFix(Controll.Update.field);
 
@@ -305,7 +281,7 @@ const init = function() {
 
   // down failed & row incomplete
   function failureRowFlow() {
-    if( !State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number) &&
+    if( !State.Movable.down(Controll.Update.field, State.Block.current) &&
       !State.Complete.check(Controll.Update.field)) {
 
       // stop user action
@@ -319,7 +295,7 @@ const init = function() {
         // delay for continue //
         await Fn.sleep(500);
 
-        if(State.Movable.down(Controll.Update.field, State.Block.deepCopy.BLOCKS[State.Block.blockNumber].number)) {
+        if(State.Movable.down(Controll.Update.field, State.Block.current)) {
 
           State.Movable.pause = false;
 

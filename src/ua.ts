@@ -1,5 +1,3 @@
-import * as Data from './data';
-
 // check touch device
 export function isTouchEnabled() { 
   return ( 'ontouchstart' in window ) ||  
