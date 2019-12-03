@@ -14,6 +14,8 @@ export const NUMBER = {
   LEFT_KEY: 37,
   RIGHT_KEY: 39,
   ENTER_KEY: 13,
+  PAUSE_KEY: 80,
+  RESTART_KEY: 82,
   LEFT_MOVE: -1,
   RIGHT_MOVE: 1,
   DEGREES: 90,

@@ -219,7 +219,33 @@ export const UserEvent =　 {
     return this._flag = false;
   },
 
-  pauseInput: function() {
+  pause: function(event: Event) {
+    if(UA.isTouchEnabled) {
+      
+    }
+
+    const key = event as KeyboardEvent;
+    if (key.keyCode === Data.NUMBER.PAUSE_KEY) {
+      if(Debug.Settings.console) {
+        console.log('pause inputted');
+      }
+      return this._flag = true;
+    }
     return this._flag = false;
-  }
+  },
+
+  restart: function(event: Event) {
+    if(UA.isTouchEnabled) {
+      
+    }
+
+    const key = event as KeyboardEvent;
+    if (key.keyCode === Data.NUMBER.RESTART_KEY) {
+      if(Debug.Settings.console) {
+        console.log('restart inputted');
+      }
+      return this._flag = true;
+    }
+    return this._flag = false;
+  },
 }

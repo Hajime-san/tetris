@@ -56,6 +56,32 @@ const init = function() {
       }, State.Info.speed)
     }
   }
+
+  // pause auto move
+  function pauseGame() {
+    if(Debug.Settings.autoMove) {
+      // stop user action
+      State.Movable.pause = true;
+
+      // clear interval
+      clearInterval(intervalDownMove);
+      clearInterval(intervalDownCheck);
+    }
+  }
+
+  // restart auto move
+  function restartGame() {
+    if(Debug.Settings.autoMove) {
+      // stop user action
+      State.Movable.pause = false;
+
+      // restart interval down
+      clearInterval(intervalDownMove);
+      intervalDownMove = downMove();
+      clearInterval(intervalDownCheck);
+      intervalDownCheck = downCheck();
+    }
+  }
   /******************************************/ 
 
 
@@ -327,6 +353,16 @@ const init = function() {
     // when keyboard input
     if( !event.isTrusted) {
       return;
+    }
+
+    // pause game
+    if(Action.UserEvent.pause(event)) {
+      pauseGame();
+    }
+
+    // restart game
+    if(Action.UserEvent.restart(event)) {
+      restartGame();
     }
 
     // block check time
