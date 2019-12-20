@@ -8,7 +8,7 @@ import * as Controll from './controll';
 
 export const ctx = Data.canvas.getContext('2d') as CanvasRenderingContext2D;
 // use anti-aliasing or not
-if(Debug.Settings.antiAliasing) {
+if (Debug.Settings.antiAliasing) {
   ctx.translate(0.5, 0.5);
 }
 
@@ -23,14 +23,14 @@ export const ScreenSize = {
 
 // resize canvas size
 export function resizeCanvasArea() {
-  if(ScreenSize.getWidth > 400) {
+  if (ScreenSize.getWidth > 400) {
     Data.canvas.width = 400;
     Data.canvas.height = 600;
   }
-  if(ScreenSize.getHeight < 600) {
+  if (ScreenSize.getHeight < 600) {
     Data.canvas.height = Math.floor(ScreenSize.getHeight * 0.9);
   }
-  if(ScreenSize.getWidth < 420 && ScreenSize.getWidth > 320) {
+  if (ScreenSize.getWidth < 420 && ScreenSize.getWidth > 320) {
     Data.canvas.width = ScreenSize.getWidth;
     Data.canvas.height = 600;
 
@@ -41,10 +41,10 @@ export function resizeCanvasArea() {
     GRID_SIZE.getVertical();
 
     GRID_SIZE.QUEUE_STEP = GRID_SIZE.STEP - GRID_SIZE.STANDARD;
-    
+
   }
 
-  if(ScreenSize.getWidth < 321) {
+  if (ScreenSize.getWidth < 321) {
     Data.canvas.width = ScreenSize.getWidth;
 
     GRID_SIZE.HORIZON = Math.floor(GRID_SIZE.HORIZON * 0.85);
@@ -65,7 +65,7 @@ export const GRID_SIZE = {
   STANDARD: 7,
   STEP: 27,
   QUEUE_STEP: 20,
-  getVertical: function() {
+  getVertical: function () {
     this.VERTICAL = this.STEP * Data.NUMBER.COLUMN;
   },
 }
@@ -86,14 +86,14 @@ const TEXT = {
 }
 
 export function clearAll() {
-  ctx.clearRect(0,0,Data.canvas.width,Data.canvas.height);
+  ctx.clearRect(0, 0, Data.canvas.width, Data.canvas.height);
 }
 
 
 function fillBackGround() {
   // background
   ctx.fillStyle = 'rgb(0,0,0)';
-  ctx.fillRect(0,0,Data.canvas.width,Data.canvas.height);
+  ctx.fillRect(0, 0, Data.canvas.width, Data.canvas.height);
   ctx.fill();
 }
 
@@ -109,11 +109,11 @@ export const Division = {
     ctx.fillText(TEXT.PLAY,
       (Data.canvas.width - playWdith) / 2,
       Data.canvas.height / 2);
-    
+
 
     // replay button
     const play = (e: MouseEvent) => {
-      
+
       const button = Object.create(Action.onCanvas);
       button.point(e);
       button.figure = 'square';
@@ -121,22 +121,22 @@ export const Division = {
       button.square.y = (Data.canvas.height / 2) - 20;
       button.square.w = playWdith;
       button.square.h = 40;
-      
-      
+
+
       if (button.hit()) {
-        Data.canvas.removeEventListener('click', play ,false);
+        Data.canvas.removeEventListener('click', play, false);
         window.removeEventListener('keydown', keyDown, false);
         callback();
       }
 
     }
 
-    Data.canvas.addEventListener('click', play ,false);
+    Data.canvas.addEventListener('click', play, false);
 
     // if enter key pressed
     const keyDown = (event: KeyboardEvent) => {
-      if(Action.UserEvent.confirm(event)) {
-        Data.canvas.removeEventListener('click', play ,false);
+      if (Action.UserEvent.confirm(event)) {
+        Data.canvas.removeEventListener('click', play, false);
         window.removeEventListener('keydown', keyDown, false);
         callback();
       }
@@ -145,11 +145,11 @@ export const Division = {
     window.addEventListener('keydown', keyDown, false);
   },
 
-  gameOver: function(callback: () => void) {
-  
+  gameOver: function (callback: () => void) {
+
     // text
     ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.fillRect(0,0,Data.canvas.width,Data.canvas.height);
+    ctx.fillRect(0, 0, Data.canvas.width, Data.canvas.height);
     ctx.fill();
     ctx.font = `${TEXT.FONTSIZE2 + TEXT.FONT}`;
     ctx.fillStyle = 'rgba(51,51,51,1.0)';
@@ -160,11 +160,11 @@ export const Division = {
       Data.canvas.height / 2);
     ctx.fillText(TEXT.REPLAY,
       (Data.canvas.width - replayWdith) / 2,
-      (Data.canvas.height / 2)+40);
+      (Data.canvas.height / 2) + 40);
 
     // replay button
     const replay = (e: MouseEvent) => {
-      
+
       const button = Object.create(Action.onCanvas);
       button.point(e);
       button.figure = 'square';
@@ -172,29 +172,29 @@ export const Division = {
       button.square.y = (Data.canvas.height / 2);
       button.square.w = replayWdith;
       button.square.h = 40;
-      
-      
+
+
       if (button.hit()) {
-        Data.canvas.removeEventListener('click', replay ,false);
+        Data.canvas.removeEventListener('click', replay, false);
         window.removeEventListener('keydown', keyDown, false);
         callback();
       }
 
     }
 
-    Data.canvas.addEventListener('click', replay ,false);
+    Data.canvas.addEventListener('click', replay, false);
 
     // if enter key pressed
     const keyDown = (event: KeyboardEvent) => {
-      if(Action.UserEvent.confirm(event)) {
-        Data.canvas.removeEventListener('click', replay ,false);
+      if (Action.UserEvent.confirm(event)) {
+        Data.canvas.removeEventListener('click', replay, false);
         window.removeEventListener('keydown', keyDown, false);
         callback();
       }
     }
-    
+
     window.addEventListener('keydown', keyDown, false);
-    
+
   }
 }
 
@@ -205,7 +205,7 @@ export const TouchAction = {
 
   // left button
   left: function () {
-    
+
     const HORIZON = Data.canvas.width / 2 - (Data.canvas.width / 2 - this._LENGTH * 2);
     const CENTER = GRID_SIZE.VERTICAL + this._MARGIN_BOTTOM;
     const LENGTH = this._LENGTH;
@@ -228,16 +228,16 @@ export const TouchAction = {
     const circle = new Path2D();
     ctx.beginPath();
     circle.arc(HORIZON + 10, CENTER, RADIANS, 0, 2 * Math.PI);
-  
+
     function render() {
       ctx.stroke(triangle);
       ctx.stroke(line);
       ctx.stroke(circle);
     }
-    
+
     return {
       render,
-      rect : [(HORIZON+LENGTH) - this._RADIANS,CENTER,RADIANS]
+      rect: [(HORIZON + LENGTH) - this._RADIANS, CENTER, RADIANS]
     }
   },
 
@@ -265,16 +265,16 @@ export const TouchAction = {
     const circle = new Path2D();
     ctx.beginPath();
     circle.arc(HORIZON + 10, CENTER, RADIANS, 0, 2 * Math.PI);
-    
+
     function render() {
       ctx.stroke(triangle);
       ctx.stroke(line);
       ctx.stroke(circle);
     }
-    
+
     return {
       render,
-      rect : [(HORIZON+LENGTH) - this._RADIANS,CENTER,RADIANS]
+      rect: [(HORIZON + LENGTH) - this._RADIANS, CENTER, RADIANS]
     }
   },
 
@@ -308,10 +308,10 @@ export const TouchAction = {
       ctx.stroke(line);
       ctx.stroke(circle);
     }
-    
+
     return {
       render,
-      rect : [(HORIZON+LENGTH) - this._RADIANS,CENTER,RADIANS]
+      rect: [(HORIZON + LENGTH) - this._RADIANS, CENTER, RADIANS]
     }
   },
 
@@ -335,7 +335,7 @@ export const TouchAction = {
     triangle2.moveTo(HORIZON + (LENGTH / 2.7), CENTER + (LENGTH / 9));
     triangle2.lineTo(HORIZON + (LENGTH / 1.5), CENTER + (LENGTH / 5.8));
     triangle2.lineTo(HORIZON + (LENGTH / 1), CENTER + (LENGTH / 9));
-    
+
 
     // circle
     const circle = new Path2D();
@@ -347,10 +347,10 @@ export const TouchAction = {
       ctx.stroke(triangle2);
       ctx.stroke(circle);
     }
-    
+
     return {
       render,
-      rect : [(HORIZON+LENGTH) - this._RADIANS,CENTER,RADIANS]
+      rect: [(HORIZON + LENGTH) - this._RADIANS, CENTER, RADIANS]
     }
   },
 
@@ -360,7 +360,7 @@ export const TouchAction = {
     const CENTER = GRID_SIZE.VERTICAL + this._MARGIN_BOTTOM + (this._LENGTH * 3);
     const LENGTH = this._LENGTH;
     const RADIANS = this._LENGTH + this._RADIANS;
-    
+
 
     // triangle
     const triangle = new Path2D();
@@ -384,13 +384,62 @@ export const TouchAction = {
       ctx.stroke(circleLine);
       ctx.stroke(circle);
     }
-    
+
     return {
       render,
-      rect : [(HORIZON+LENGTH) - this._RADIANS,CENTER,RADIANS]
+      rect: [(HORIZON + LENGTH) - this._RADIANS, CENTER, RADIANS]
     };
   },
-  
+
+  // pause button
+  pause: function () {
+    const HORIZON = Data.canvas.width / 2 - (Data.canvas.width / 2 - this._LENGTH * 1.75);
+    const CENTER = GRID_SIZE.VERTICAL + this._MARGIN_BOTTOM + (this._LENGTH * 3.25);
+    const LENGTH = this._LENGTH;
+    const RADIANS = this._LENGTH;
+
+
+    // triangle
+    const triangle = new Path2D();
+    ctx.beginPath();
+    triangle.moveTo(HORIZON + (LENGTH / 2), CENTER - (LENGTH / 3));
+    triangle.lineTo(HORIZON + LENGTH, CENTER);
+    triangle.lineTo(HORIZON + (LENGTH / 2), CENTER + (LENGTH / 3));
+
+    // line1
+    const line1 = new Path2D();
+    ctx.beginPath();
+    line1.moveTo(HORIZON + (LENGTH / 2), CENTER - (LENGTH / 3));
+    line1.lineTo(HORIZON + (LENGTH / 2), CENTER + (LENGTH / 3));
+
+    // line2
+    const line2 = new Path2D();
+    ctx.beginPath();
+    line2.moveTo(HORIZON + (LENGTH / 1.25), CENTER - (LENGTH / 3));
+    line2.lineTo(HORIZON + (LENGTH / 1.25), CENTER + (LENGTH / 3));
+
+    // circle
+    const circle = new Path2D();
+    ctx.beginPath();
+    circle.arc(HORIZON + 10, CENTER, RADIANS, 0, 2 * Math.PI);
+
+    function render() {
+      if (Debug.Settings.autoMove) {
+        ctx.stroke(line1);
+        ctx.stroke(line2);
+      } else {
+        ctx.fill(triangle);
+      }
+
+      ctx.stroke(circle);
+    }
+
+    return {
+      render,
+      rect: [(HORIZON + LENGTH) - this._RADIANS, CENTER, RADIANS]
+    };
+  },
+
 }
 
 export function renderField() {
@@ -402,7 +451,7 @@ export function renderField() {
   ctx.lineWidth = 1;
   ctx.strokeStyle = 'rgba(255,255,255,0.6)';
   ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  
+
   // outline
   const outline = new Path2D();
   ctx.beginPath();
@@ -413,27 +462,18 @@ export function renderField() {
   const grid = new Path2D();
 
   // horizon line
-  for (let i = GRID_SIZE.STEP + GRID_SIZE.STANDARD; i < GRID_SIZE.VERTICAL; i += GRID_SIZE.STEP){
+  for (let i = GRID_SIZE.STEP + GRID_SIZE.STANDARD; i < GRID_SIZE.VERTICAL; i += GRID_SIZE.STEP) {
     ctx.beginPath();
     grid.moveTo(GRID_SIZE.STANDARD, i);
     grid.lineTo(GRID_SIZE.HORIZON + GRID_SIZE.STANDARD, i);
   }
   // vertical line
-  for (let i = GRID_SIZE.STEP + GRID_SIZE.STANDARD; i < GRID_SIZE.HORIZON; i += GRID_SIZE.STEP){
+  for (let i = GRID_SIZE.STEP + GRID_SIZE.STANDARD; i < GRID_SIZE.HORIZON; i += GRID_SIZE.STEP) {
     ctx.beginPath();
     grid.moveTo(i, GRID_SIZE.STANDARD);
     grid.lineTo(i, GRID_SIZE.VERTICAL + GRID_SIZE.STANDARD);
   }
   ctx.stroke(grid);
-
-  // touch button
-  if(UA.isTouchEnabled()) {
-    TouchAction.left().render();
-    TouchAction.right().render();
-    TouchAction.down().render();
-    TouchAction.hardDown().render();
-    TouchAction.rotate().render();
-  }
 
   // HUD
   ctx.font = `${TEXT.FONTSIZE + TEXT.FONT}`;
@@ -442,39 +482,59 @@ export function renderField() {
   const lineWdith = Math.floor(ctx.measureText(TEXT.LINE).width);
   const scoreNumberWidth = Math.floor(ctx.measureText(State.Info._score.toString()).width);
   const lineNumberWidth = Math.floor(ctx.measureText(State.Info.completedRow.toString()).width);
-  
+
   ctx.fillText(TEXT.NEXT,
-            (GRID_SIZE.HORIZON + Data.canvas.width - (nextWdith / 2)) / 2,
-            GRID_SIZE.STEP);
+    (GRID_SIZE.HORIZON + Data.canvas.width - (nextWdith / 2)) / 2,
+    GRID_SIZE.STEP);
   ctx.fillText(TEXT.SCORE,
-            (GRID_SIZE.HORIZON + Data.canvas.width - (scoreWdith / 2)) / 2,
-            (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 7)) );
+    (GRID_SIZE.HORIZON + Data.canvas.width - (scoreWdith / 2)) / 2,
+    (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 7)));
   ctx.fillText(State.Info._score.toString(),
-            (GRID_SIZE.HORIZON + Data.canvas.width - (scoreNumberWidth / 2)) / 2,
-            (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 5) ) );
+    (GRID_SIZE.HORIZON + Data.canvas.width - (scoreNumberWidth / 2)) / 2,
+    (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 5)));
   ctx.fillText(TEXT.LINE,
-            (GRID_SIZE.HORIZON + Data.canvas.width - (lineWdith / 2)) / 2,
-            (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 3) ) );
+    (GRID_SIZE.HORIZON + Data.canvas.width - (lineWdith / 2)) / 2,
+    (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 3)));
   ctx.fillText(State.Info.completedRow.toString(),
-            (GRID_SIZE.HORIZON + Data.canvas.width - (lineNumberWidth / 2)) / 2,
-            (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 1) ) );
+    (GRID_SIZE.HORIZON + Data.canvas.width - (lineNumberWidth / 2)) / 2,
+    (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 1)));
 
 }
 
 export function clearBlock(fieldArray: Data.field) {
 
-  fieldArray.forEach((v,i)=>{
-    if(v === Data.STRING.EMPTY) {
+  fieldArray.forEach((v, i) => {
+    if (v === Data.STRING.EMPTY) {
       return;
     }
 
     // draw controllable block
-    if(v === Data.STRING.CURRENT) {
+    if (v === Data.STRING.CURRENT) {
       ctx.clearRect((Fn.fixToFirstDigit(i) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
-                  (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
-                                        GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
+        (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
+        GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
     }
   })
+}
+
+export function renderButton() {
+
+  // line settings
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+
+  ctx.clearRect(0, GRID_SIZE.VERTICAL + GRID_SIZE.STEP, Data.canvas.width, GRID_SIZE.HORIZON);
+
+  // touch button
+  if (UA.isTouchEnabled()) {
+    TouchAction.left().render();
+    TouchAction.right().render();
+    TouchAction.down().render();
+    TouchAction.hardDown().render();
+    TouchAction.rotate().render();
+    TouchAction.pause().render();
+  }
 }
 
 export function deleteCompletedBlock(fieldArray: Data.field) {
@@ -482,17 +542,17 @@ export function deleteCompletedBlock(fieldArray: Data.field) {
   return new Promise<void>((resolve) => {
     //let timeDelay = 0;
     //let fasterTime = -(Controll.Update.completeRowNumbers.length * 10);
-    Controll.Update.completeRowNumbers.forEach((v,_,arr)=>{
-      [...Array(Data.NUMBER.ROW)].forEach((_,itelator)=>{
+    Controll.Update.completeRowNumbers.forEach((v, _, arr) => {
+      [...Array(Data.NUMBER.ROW)].forEach((_, itelator) => {
         let i = v * Data.NUMBER.ROW + itelator;
 
-        if (i >= ((arr[arr.length - 1] * Data.NUMBER.ROW) + (Data.NUMBER.ROW - 1) ) ) {
+        if (i >= ((arr[arr.length - 1] * Data.NUMBER.ROW) + (Data.NUMBER.ROW - 1))) {
           resolve();
         }
 
         ctx.clearRect((Fn.fixToFirstDigit(i) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
-                    (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
-                                          GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
+          (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
+          GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
 
         // setTimeout(()=>{
         //   const clearSequence = setInterval(()=> {
@@ -500,29 +560,29 @@ export function deleteCompletedBlock(fieldArray: Data.field) {
         //               (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
         //                                     GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
         //  }, 50);
-          
+
         // }, timeDelay)
         // timeDelay += 50 + fasterTime;
       })
     })
-    
-    
+
+
   })
 }
 
 export function renderBlock(fieldArray: Data.field) {
 
-  fieldArray.forEach((v,i)=>{
-    if(v === Data.STRING.EMPTY) {
+  fieldArray.forEach((v, i) => {
+    if (v === Data.STRING.EMPTY) {
       return;
     }
-    
+
     // draw controllable block
-    if(v === Data.STRING.CURRENT) {
+    if (v === Data.STRING.CURRENT) {
       ctx.fillStyle = State.Block.deepCopy.BLOCKS[State.Block.blockNumber].color;
       ctx.fillRect((Fn.fixToFirstDigit(i) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
-                  (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
-                                        GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
+        (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
+        GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
       ctx.fill();
     }
 
@@ -530,8 +590,8 @@ export function renderBlock(fieldArray: Data.field) {
     if (v !== Data.STRING.CURRENT && typeof v === 'number') {
       ctx.fillStyle = State.Block.deepCopy.BLOCKS[v].color;
       ctx.fillRect((Fn.fixToFirstDigit(i) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
-                  (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
-                                        GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
+        (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.STEP) + (GRID_SIZE.STANDARD + 1),
+        GRID_SIZE.STEP - 2, GRID_SIZE.STEP - 2);
       ctx.fill();
     }
   })
@@ -545,68 +605,68 @@ export function renderQueue(queue: Data.field) {
   //const num = State.blockQueue.queue[1];
   //const block = State.rotatedBlock(QueueProp.BLOCKS[num].number, angle, false, num);
   //block.forEach(v => queue[v] = num);
-  
+
   // pick block number form block queue
   const nums = State.blockQueue.queue.slice(1, 4);
 
-  nums.forEach((v,i)=> {
+  nums.forEach((v, i) => {
     let angle = 0;
     let start = 0;
     let temp = State.rotatedBlock(QueueProp.BLOCKS[v].number, angle, false, v);
 
     // fix horizontal position
-    if(v === 0) {
+    if (v === 0) {
       angle = 0;
     }
-    if(v !== 0) {
+    if (v !== 0) {
       angle = Data.NUMBER.DEGREES;
     }
-    if(v === 1) {
-      temp.forEach((_,i,arr) => { arr[i] -= (Data.NUMBER.ROW - 1) })
+    if (v === 1) {
+      temp.forEach((_, i, arr) => { arr[i] -= (Data.NUMBER.ROW - 1) })
     }
-    if(v === 2) {
+    if (v === 2) {
       angle = Data.NUMBER.DEGREES * 3;
-      temp.forEach((_,i,arr) => { arr[i] -= Data.NUMBER.ROW });
+      temp.forEach((_, i, arr) => { arr[i] -= Data.NUMBER.ROW });
     }
-    if(v === 3) {
-      temp.forEach((_,i,arr) => { arr[i] += (Data.NUMBER.ROW + 1) }) 
+    if (v === 3) {
+      temp.forEach((_, i, arr) => { arr[i] += (Data.NUMBER.ROW + 1) })
     }
-    if(v === 4) {
-      temp.forEach((_,i,arr) => { arr[i] += (Data.NUMBER.ROW + 1) })
+    if (v === 4) {
+      temp.forEach((_, i, arr) => { arr[i] += (Data.NUMBER.ROW + 1) })
       temp[3] -= Data.NUMBER.ROW * 2;
     }
-    if(v === 5) {
-      temp.forEach((_,i,arr) => { arr[i] -= (Data.NUMBER.ROW + 1) })
+    if (v === 5) {
+      temp.forEach((_, i, arr) => { arr[i] -= (Data.NUMBER.ROW + 1) })
     }
-    if(v === 6) {
-      temp.forEach((_,i,arr) => { arr[i] -= 1 })
+    if (v === 6) {
+      temp.forEach((_, i, arr) => { arr[i] -= 1 })
     }
-  
+
     // fix vertical position 
-    if( i === 0) {
+    if (i === 0) {
       temp.forEach(w => queue[w] = v);
     }
-    if( i === 1) {
+    if (i === 1) {
       start += 30;
-      temp.forEach(w => queue[w+start] = v);
+      temp.forEach(w => queue[w + start] = v);
     }
-    if( i === 2) {
+    if (i === 2) {
       start += 60;
-      temp.forEach(w => queue[w+start] = v);
+      temp.forEach(w => queue[w + start] = v);
     }
   })
-  
-  queue.forEach((v,i)=>{
-    if(v === Data.STRING.EMPTY) {
+
+  queue.forEach((v, i) => {
+    if (v === Data.STRING.EMPTY) {
       return;
     }
     if (typeof v === 'number') {
       ctx.fillStyle = QueueProp.BLOCKS[v].color;
       ctx.fillRect((Fn.fixToFirstDigit(i) * GRID_SIZE.QUEUE_STEP) + (GRID_SIZE.HORIZON - GRID_SIZE.STEP),
-                (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.QUEUE_STEP) + GRID_SIZE.STEP * 1.5,
-                                      GRID_SIZE.QUEUE_STEP - 2, GRID_SIZE.QUEUE_STEP - 2);
+        (Math.floor(i / Data.NUMBER.ROW) * GRID_SIZE.QUEUE_STEP) + GRID_SIZE.STEP * 1.5,
+        GRID_SIZE.QUEUE_STEP - 2, GRID_SIZE.QUEUE_STEP - 2);
       ctx.fill();
     }
-  })  
+  })
 
 }

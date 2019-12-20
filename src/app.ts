@@ -20,7 +20,7 @@ import * as Debug from './dev';
 //   }
 // });
 
-const init = function() {
+const init = function () {
 
   // allow user action
   State.Movable.pause = false;
@@ -35,22 +35,22 @@ const init = function() {
   let intervalDownCheck = downCheck();
 
   function downMove() {
-    if(Debug.Settings.autoMove) {
+    if (Debug.Settings.autoMove) {
       return window.setInterval(downFlow, State.Info.speed);
     }
   }
 
   function downCheck() {
-    if(Debug.Settings.autoMove) {
-      return window.setInterval(()=>{
-        if(State.Movable.down(Controll.Update.field, State.Block.current) ) {
+    if (Debug.Settings.autoMove) {
+      return window.setInterval(() => {
+        if (State.Movable.down(Controll.Update.field, State.Block.current)) {
           return;
         }
         clearInterval(intervalDownMove);
         clearInterval(intervalDownCheck);
-        
+
         completeRowFlow();
-    
+
         failureRowFlow();
 
       }, State.Info.speed)
@@ -59,11 +59,9 @@ const init = function() {
 
   // pause auto move
   function pauseGame() {
-    if(Debug.Settings.autoMove) {
-      // stop user action
+    if (!Debug.Settings.autoMove) {
       State.Movable.pause = true;
 
-      // clear interval
       clearInterval(intervalDownMove);
       clearInterval(intervalDownCheck);
     }
@@ -71,18 +69,16 @@ const init = function() {
 
   // restart auto move
   function restartGame() {
-    if(Debug.Settings.autoMove) {
-      // stop user action
+    if (Debug.Settings.autoMove) {
       State.Movable.pause = false;
 
-      // restart interval down
       clearInterval(intervalDownMove);
       intervalDownMove = downMove();
       clearInterval(intervalDownCheck);
       intervalDownCheck = downCheck();
     }
   }
-  /******************************************/ 
+  /******************************************/
 
 
   /** 
@@ -107,14 +103,16 @@ const init = function() {
     Controll.Update.transfer(State.Block.current, Controll.Update.field);
     // draw grid
     Render.renderField();
+    // draw button
+    Render.renderButton();
     // draw block
     Render.renderBlock(Controll.Update.field);
     // draw bock queue
     Render.renderQueue(Controll.Update.queueField);
-    
+
   }
 
-  initGame();  
+  initGame();
 
   /******************************************/
 
@@ -127,8 +125,8 @@ const init = function() {
     State.Info.incrementScore();
 
     // game over
-    if( !State.Playable.continue(Controll.Update.field)) {
-      window.removeEventListener('keydown',userActionFlow,false);
+    if (!State.Playable.continue(Controll.Update.field)) {
+      window.removeEventListener('keydown', userActionFlow, false);
       Render.Division.gameOver(init);
 
       State.Block.resetAngle();
@@ -174,8 +172,10 @@ const init = function() {
     Controll.Update.transfer(State.Block.current, Controll.Update.field);
     // clear all canvas area
     Render.clearAll();
-    // draw flied gird 
+    // draw gird 
     Render.renderField();
+    // draw button
+    Render.renderButton();
     // draw block
     Render.renderBlock(Controll.Update.field);
     // draw block queue
@@ -190,13 +190,13 @@ const init = function() {
     intervalDownMove = downMove();
     clearInterval(intervalDownCheck);
     intervalDownCheck = downCheck();
-    
+
   }
 
   // down posibility check && down input check
   function downFlow() {
-    if(State.Movable.down(Controll.Update.field, State.Block.current)) {
-      
+    if (State.Movable.down(Controll.Update.field, State.Block.current)) {
+
       Render.clearBlock(Controll.Update.field);
 
       Controll.Update.clear(State.Block.current, Controll.Update.field);
@@ -210,19 +210,19 @@ const init = function() {
   // hard down posibility check && hard down input check
   function hardDownFlow() {
     Render.clearBlock(Controll.Update.field);
-    while(State.Movable.down(Controll.Update.field, State.Block.current)) {
+    while (State.Movable.down(Controll.Update.field, State.Block.current)) {
       Controll.Update.clear(State.Block.current, Controll.Update.field);
       Controll.Update.transfer(Controll.Direction.down(State.Block.current), Controll.Update.field);
       State.Block.current = Controll.Direction.down(State.Block.current);
     }
-    
+
     Render.renderBlock(Controll.Update.field);
-    
+
   }
 
   // left posibility check
   function leftFlow() {
-    if(State.Movable.left(Controll.Update.field, State.Block.current) ) {
+    if (State.Movable.left(Controll.Update.field, State.Block.current)) {
 
       Render.clearBlock(Controll.Update.field);
 
@@ -237,7 +237,7 @@ const init = function() {
 
   // right posibility check
   function rightFlow() {
-    if(State.Movable.right(Controll.Update.field, State.Block.current) ) {
+    if (State.Movable.right(Controll.Update.field, State.Block.current)) {
 
       Render.clearBlock(Controll.Update.field);
 
@@ -252,18 +252,18 @@ const init = function() {
 
   // rotate posibility check
   function rotateFlow() {
-    if(State.Movable.rotate(Controll.Update.field,
+    if (State.Movable.rotate(Controll.Update.field,
       State.rotatedBlock(State.Block.current, State.Block.angle, true, State.Block.blockNumber),
       State.Block.current, State.Block.blockNumber)) {
 
       State.Block.angle = Data.NUMBER.DEGREES;
 
       Render.clearBlock(Controll.Update.field);
-      
+
       Controll.Update.clear(State.Block.current, Controll.Update.field);
-      State.Block.current = State.rotatedBlock(State.Block.current, State.Block.angle, true,  State.Block.blockNumber);
+      State.Block.current = State.rotatedBlock(State.Block.current, State.Block.angle, true, State.Block.blockNumber);
       Controll.Update.transfer(State.Block.current, Controll.Update.field);
-      
+
       Render.renderBlock(Controll.Update.field);
 
     }
@@ -271,19 +271,19 @@ const init = function() {
 
   // down failed & row complete
   function completeRowFlow() {
-    
-    if( !State.Movable.down(Controll.Update.field, State.Block.current) &&
-    State.Complete.check(Controll.Update.field)) {
+
+    if (!State.Movable.down(Controll.Update.field, State.Block.current) &&
+      State.Complete.check(Controll.Update.field)) {
       // stop user action
       State.Movable.pause = true;
       State.Movable.checkTime = true;
       // clear interval
       clearInterval(intervalDownMove);
       clearInterval(intervalDownCheck);
-      
+
       (async () => {
         await Fn.sleep(300);
-        
+
         // delete row rendering
         Controll.Update.deleteRow(Controll.Update.field);
         State.Info.incrementCompletedRow();
@@ -307,7 +307,7 @@ const init = function() {
 
   // down failed & row incomplete
   function failureRowFlow() {
-    if( !State.Movable.down(Controll.Update.field, State.Block.current) &&
+    if (!State.Movable.down(Controll.Update.field, State.Block.current) &&
       !State.Complete.check(Controll.Update.field)) {
 
       // stop user action
@@ -321,7 +321,7 @@ const init = function() {
         // delay for continue //
         await Fn.sleep(500);
 
-        if(State.Movable.down(Controll.Update.field, State.Block.current)) {
+        if (State.Movable.down(Controll.Update.field, State.Block.current)) {
 
           State.Movable.pause = false;
 
@@ -335,7 +335,7 @@ const init = function() {
 
         Controll.Update.transferToFix(Controll.Update.field);
         await Fn.sleep(100);
-        
+
         continueGame();
       })();
     }
@@ -351,65 +351,74 @@ const init = function() {
   const userActionFlow = (event: Event) => {
 
     // when keyboard input
-    if( !event.isTrusted) {
+    if (!event.isTrusted) {
       return;
     }
 
-    // pause game
-    if(Action.UserEvent.pause(event)) {
-      pauseGame();
+    // pause or restart game
+    if (Action.UserEvent.pause(event)) {
+
+      if (!State.Movable.pause && !State.Movable.checkTime) {
+        State.Movable.checkTime = true;
+        Debug.Settings.autoMove = false;
+        Render.renderButton();
+        pauseGame();
+      } else {
+        State.Movable.checkTime = false;
+        Debug.Settings.autoMove = true;
+        Render.renderButton();
+        restartGame();
+      }
+
+      return
     }
 
-    // restart game
-    if(Action.UserEvent.restart(event)) {
-      restartGame();
-    }
 
     // block check time
-    if(State.Movable.checkTime) {
+    if (State.Movable.checkTime) {
       return;
     }
-    
-    if(Action.UserEvent.left(event)) {
+
+    if (Action.UserEvent.left(event)) {
       leftFlow();
     }
 
-    if(Action.UserEvent.right(event)) {
+    if (Action.UserEvent.right(event)) {
       rightFlow();
     }
 
-    if(Action.UserEvent.rotate(event)) {
+    if (Action.UserEvent.rotate(event)) {
       rotateFlow();
     }
 
     // pause check
-    if(State.Movable.pause) {
+    if (State.Movable.pause) {
       return;
     }
-    
-    if(Action.UserEvent.down(event)) {
+
+    if (Action.UserEvent.down(event)) {
       downFlow();
     }
 
-    if(Action.UserEvent.hardDown(event)) {
+    if (Action.UserEvent.hardDown(event)) {
       hardDownFlow();
     }
 
     completeRowFlow();
 
     failureRowFlow();
-    
+
   }
 
-  if(UA.isTouchEnabled()) {
-    Data.canvas.addEventListener('click', userActionFlow, {passive: false});
+  if (UA.isTouchEnabled()) {
+    Data.canvas.addEventListener('click', userActionFlow, { passive: false });
   } else {
-    window.addEventListener('keydown', userActionFlow, {passive: false});
+    window.addEventListener('keydown', userActionFlow, { passive: false });
   }
-  
+
 }
 
-window.addEventListener('load', ()=> {
+window.addEventListener('load', () => {
   Render.resizeCanvasArea();
   Render.Division.start(init);
 });

@@ -3,18 +3,18 @@ import * as Data from './data';
 import * as Debug from './dev';
 import * as Render from './render';
 
-export const onCanvas =　 {
+export const onCanvas = {
 
   rect: Data.canvas.getBoundingClientRect(),
   rectX: 0,
   rectY: 0,
-  point: function(event: MouseEvent) {
+  point: function (event: MouseEvent) {
     this.rect = Data.canvas.getBoundingClientRect();
     const x = event.clientX - this.rect.left,
-          y = event.clientY - this.rect.top;
+      y = event.clientY - this.rect.top;
     return this.rectX = x, this.rectY = y;
   },
-  
+
   figure: '',
 
   // tap area
@@ -26,30 +26,30 @@ export const onCanvas =　 {
     r: 0
   },
   // hit check
-  hit : function() {
-    if(this.figure === '') {
-      if(Debug.Settings.console) {
+  hit: function () {
+    if (this.figure === '') {
+      if (Debug.Settings.console) {
         console.log('property:figure not defined');
       }
       return
     }
-    if(this.figure === 'square') {
+    if (this.figure === 'square') {
       return (this.square.x <= this.rectX && this.rectX <= this.square.x + this.square.w)
-      && (this.square.y <= this.rectY && this.rectY <= this.square.y + this.square.h)
+        && (this.square.y <= this.rectY && this.rectY <= this.square.y + this.square.h)
     }
-    if(this.figure === 'circle') {
+    if (this.figure === 'circle') {
       return Math.pow(this.square.x - this.rectX, 2) + Math.pow(this.square.y - this.rectY, 2) <= Math.pow(this.square.r, 2);
     }
   }
 }
 
-export const UserEvent =　 {
+export const UserEvent = {
 
   _flag: false,
 
-  rotate: function(event: Event) {
+  rotate: function (event: Event) {
     // when touch device
-    if(UA.isTouchEnabled()) {
+    if (UA.isTouchEnabled()) {
       const mouse = event as MouseEvent;
       // crate hit area
       const button = Object.create(onCanvas);
@@ -58,9 +58,9 @@ export const UserEvent =　 {
       button.square.x = Render.TouchAction.rotate().rect[0];
       button.square.y = Render.TouchAction.rotate().rect[1];
       button.square.r = Render.TouchAction.rotate().rect[2];
-      
+
       if (button.hit()) {
-        if(Debug.Settings.console) {
+        if (Debug.Settings.console) {
           console.log('rotate tapped');
         }
         return this._flag = true;
@@ -70,16 +70,16 @@ export const UserEvent =　 {
 
     const key = event as KeyboardEvent;
     if (key.keyCode === Data.NUMBER.UP_KEY) {
-      if(Debug.Settings.console) {
+      if (Debug.Settings.console) {
         console.log('up inputted');
       }
       return this._flag = true;
     }
     return this._flag = false;
   },
-  left: function(event: Event) {
+  left: function (event: Event) {
     // when touch device
-    if(UA.isTouchEnabled()) {
+    if (UA.isTouchEnabled()) {
       const mouse = event as MouseEvent;
       // crate hit area
       const button = Object.create(onCanvas);
@@ -88,12 +88,12 @@ export const UserEvent =　 {
       button.square.x = Render.TouchAction.left().rect[0];
       button.square.y = Render.TouchAction.left().rect[1];
       button.square.r = Render.TouchAction.left().rect[2];
-      
-    
+
+
       if (button.hit()) {
-        if(Debug.Settings.console) {
+        if (Debug.Settings.console) {
           console.log('left tapped');
-          
+
           // const circle = new Path2D();
           // Render.ctx.beginPath();
           // Render.ctx.fillStyle = 'rgba(255,0,0,0.7)';
@@ -107,16 +107,16 @@ export const UserEvent =　 {
 
     const key = event as KeyboardEvent;
     if (key.keyCode === Data.NUMBER.LEFT_KEY) {
-      if(Debug.Settings.console) {
+      if (Debug.Settings.console) {
         console.log('left inputted');
       }
       return this._flag = true;
     }
     return this._flag = false;
   },
-  right: function(event: Event) {
+  right: function (event: Event) {
     // when touch device
-    if(UA.isTouchEnabled()) {
+    if (UA.isTouchEnabled()) {
       const mouse = event as MouseEvent;
       // crate hit area
       const button = Object.create(onCanvas);
@@ -125,9 +125,9 @@ export const UserEvent =　 {
       button.square.x = Render.TouchAction.right().rect[0];
       button.square.y = Render.TouchAction.right().rect[1];
       button.square.r = Render.TouchAction.right().rect[2];
-    
+
       if (button.hit()) {
-        if(Debug.Settings.console) {
+        if (Debug.Settings.console) {
           console.log('right tapped');
         }
         return this._flag = true;
@@ -137,16 +137,16 @@ export const UserEvent =　 {
 
     const key = event as KeyboardEvent;
     if (key.keyCode === Data.NUMBER.RIGHT_KEY) {
-      if(Debug.Settings.console) {
+      if (Debug.Settings.console) {
         console.log('right inputted');
       }
       return this._flag = true;
     }
     return this._flag = false;
   },
-  down: function(event: Event) {
+  down: function (event: Event) {
     // when touch device
-    if(UA.isTouchEnabled()) {
+    if (UA.isTouchEnabled()) {
       const mouse = event as MouseEvent;
       // crate hit area
       const button = Object.create(onCanvas);
@@ -155,9 +155,9 @@ export const UserEvent =　 {
       button.square.x = Render.TouchAction.down().rect[0];
       button.square.y = Render.TouchAction.down().rect[1];
       button.square.r = Render.TouchAction.down().rect[2];
-      
+
       if (button.hit()) {
-        if(Debug.Settings.console) {
+        if (Debug.Settings.console) {
           console.log('down tapped');
         }
         return this._flag = true;
@@ -167,7 +167,7 @@ export const UserEvent =　 {
 
     const key = event as KeyboardEvent;
     if (key.keyCode === Data.NUMBER.DOWN_KEY) {
-      if(Debug.Settings.console) {
+      if (Debug.Settings.console) {
         console.log('down inputted');
       }
       return this._flag = true;
@@ -175,9 +175,9 @@ export const UserEvent =　 {
     return this._flag = false;
   },
 
-  hardDown: function(event: Event) {
+  hardDown: function (event: Event) {
     // when touch device
-    if(UA.isTouchEnabled()) {
+    if (UA.isTouchEnabled()) {
       const mouse = event as MouseEvent;
       // crate hit area
       const button = Object.create(onCanvas);
@@ -186,9 +186,9 @@ export const UserEvent =　 {
       button.square.x = Render.TouchAction.hardDown().rect[0];
       button.square.y = Render.TouchAction.hardDown().rect[1];
       button.square.r = Render.TouchAction.hardDown().rect[2];
-      
+
       if (button.hit()) {
-        if(Debug.Settings.console) {
+        if (Debug.Settings.console) {
           console.log('hard down tapped');
         }
         return this._flag = true;
@@ -198,7 +198,7 @@ export const UserEvent =　 {
 
     const key = event as KeyboardEvent;
     if (key.keyCode === Data.NUMBER.HARD_DOWN_KEY) {
-      if(Debug.Settings.console) {
+      if (Debug.Settings.console) {
         console.log('hard down inputted');
       }
       return this._flag = true;
@@ -206,12 +206,12 @@ export const UserEvent =　 {
     return this._flag = false;
   },
 
-  confirm: function(event: KeyboardEvent) {
-    if(UA.isTouchEnabled) {
-      
+  confirm: function (event: KeyboardEvent) {
+    if (UA.isTouchEnabled()) {
+
     }
     if (event.keyCode === Data.NUMBER.ENTER_KEY) {
-      if(Debug.Settings.console) {
+      if (Debug.Settings.console) {
         console.log('enter inputted');
       }
       return this._flag = true;
@@ -219,14 +219,30 @@ export const UserEvent =　 {
     return this._flag = false;
   },
 
-  pause: function(event: Event) {
-    if(UA.isTouchEnabled) {
-      
+  pause: function (event: Event) {
+    // when touch device
+    if (UA.isTouchEnabled()) {
+      const mouse = event as MouseEvent;
+      // crate hit area
+      const button = Object.create(onCanvas);
+      button.point(mouse);
+      button.figure = 'circle';
+      button.square.x = Render.TouchAction.pause().rect[0];
+      button.square.y = Render.TouchAction.pause().rect[1];
+      button.square.r = Render.TouchAction.pause().rect[2];
+
+      if (button.hit()) {
+        if (Debug.Settings.console) {
+          console.log('pause tapped');
+        }
+        return this._flag = true;
+      }
+      return this._flag = false;
     }
 
     const key = event as KeyboardEvent;
     if (key.keyCode === Data.NUMBER.PAUSE_KEY) {
-      if(Debug.Settings.console) {
+      if (Debug.Settings.console) {
         console.log('pause inputted');
       }
       return this._flag = true;
@@ -234,18 +250,5 @@ export const UserEvent =　 {
     return this._flag = false;
   },
 
-  restart: function(event: Event) {
-    if(UA.isTouchEnabled) {
-      
-    }
 
-    const key = event as KeyboardEvent;
-    if (key.keyCode === Data.NUMBER.RESTART_KEY) {
-      if(Debug.Settings.console) {
-        console.log('restart inputted');
-      }
-      return this._flag = true;
-    }
-    return this._flag = false;
-  },
 }
