@@ -6,6 +6,18 @@ import * as State from './state';
 import * as Action from './event';
 import * as Render from './render';
 import * as Debug from './dev';
+// import firebase, { providerTwitter } from './firebase';
+
+// const loginWithTwitter = () => {
+//   firebase.auth().signInWithRedirect(providerTwitter);
+//   firebase.auth().getRedirectResult().then(result => {
+//     console.log(result);
+//     //TODO: ex. storeに送信, DB保存,...
+//   }).catch(error => {
+//     console.log(error);
+//   });
+// }
+
 
 /** 
   setInterval event
@@ -421,4 +433,5 @@ const init = function () {
 window.addEventListener('load', () => {
   Render.resizeCanvasArea();
   Render.Division.start(init);
+
 });
