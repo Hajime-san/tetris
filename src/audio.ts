@@ -1,10 +1,3 @@
-declare global {
-  interface Window {
-    webkitAudioContext: AudioContext,
-  }
-}
-
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 export const Player = {
   _audioElem: new Audio(),
@@ -15,7 +8,6 @@ export const Player = {
   },
 
   play: function () {
-    this._audioElem.currentTime = 45;
     this._audioElem.play();
   },
 
@@ -29,3 +21,28 @@ export const Player = {
   },
 
 }
+
+const context = new AudioContext();
+
+//再生するバッファを準備
+const prepareBuffer = async (path: string) => {
+  //2. fetch APIで音声ファイルを取得
+  const res = await fetch(path);
+  //ArrayBufferを取得
+  const arr = await res.arrayBuffer();
+  //3. 音声ファイルをデコード
+  const buf = await context.decodeAudioData(arr);
+
+  return buf;
+}
+
+
+const play = async () => {
+  const source = context.createBufferSource(); //4. Sourceノードを作成
+  source.buffer = await prepareBuffer("./korobeiniki.mp3"); //5. 再生するバッファを指定
+  source.connect(context.destination); // SourceノードをDestinationにつなぐ
+  source.start(0);//6. 再生開始
+
+}
+
+play();
