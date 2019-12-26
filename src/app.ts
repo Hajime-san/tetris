@@ -5,6 +5,7 @@ import * as Controll from './controll';
 import * as State from './state';
 import * as Action from './event';
 import * as Render from './render';
+import * as Audio from './audio';
 import * as Debug from './dev';
 
 /** 
@@ -109,6 +110,8 @@ const init = function () {
     Render.renderBlock(Controll.Update.field);
     // draw bock queue
     Render.renderQueue(Controll.Update.queueField);
+    // active sound theme
+    Audio.Player.play();
 
   }
 
@@ -146,6 +149,8 @@ const init = function () {
       State.Info.resetCount();
       State.Info.resetCompletedRow();
       State.Info.resetLevelandSpeed();
+
+      Audio.Player.stop();
 
       return;
     }
