@@ -1,10 +1,3 @@
-declare global {
-  interface Window {
-    webkitAudioContext: AudioContext,
-  }
-}
-
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 export const Player = {
   _audioElem: new Audio(),
@@ -15,7 +8,6 @@ export const Player = {
   },
 
   play: function () {
-    this._audioElem.currentTime = 45;
     this._audioElem.play();
   },
 
