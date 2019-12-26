@@ -110,7 +110,6 @@ const init = function () {
     Render.renderBlock(Controll.Update.field);
     // draw bock queue
     Render.renderQueue(Controll.Update.queueField);
-    // active sound theme
     Audio.Player.play();
 
   }
@@ -131,6 +130,12 @@ const init = function () {
     if (!State.Playable.continue(Controll.Update.field)) {
       window.removeEventListener('keydown', userActionFlow, false);
       Render.Division.gameOver(init);
+
+      if (UA.isTouchEnabled()) {
+        Data.canvas.removeEventListener('click', userActionFlow);
+      } else {
+        window.removeEventListener('keydown', userActionFlow);
+      }
 
       State.Block.resetAngle();
       // reset completed row numbers
@@ -367,11 +372,13 @@ const init = function () {
         State.Movable.checkTime = true;
         Debug.Settings.autoMove = false;
         Render.renderButton();
+        Audio.Player.pause();
         pauseGame();
       } else {
         State.Movable.checkTime = false;
         Debug.Settings.autoMove = true;
         Render.renderButton();
+        Audio.Player.play();
         restartGame();
       }
 
@@ -422,6 +429,11 @@ const init = function () {
   }
 
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  // load sound theme
+  Audio.Player.init();
+});
 
 window.addEventListener('load', () => {
   Render.resizeCanvasArea();

@@ -21,7 +21,7 @@ export function fixToFirstDigit(num: number) {
 
   return original % (Math.floor(isFloat) * Data.NUMBER.ROW);
 
-  //return Number(digit.toFixed().substr(-1, 1));
+  //return Number(num.toFixed().substr(-1, 1));
 }
 
 
