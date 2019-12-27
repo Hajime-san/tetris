@@ -90,9 +90,9 @@ export function clearAll() {
 }
 
 
-function fillBackGround() {
+function fillBackGround(color: string) {
   // background
-  ctx.fillStyle = 'rgb(0,0,0)';
+  ctx.fillStyle = color;
   ctx.fillRect(0, 0, Data.canvas.width, Data.canvas.height);
   ctx.fill();
 }
@@ -101,7 +101,7 @@ export const Division = {
 
   start: function (callback: () => void) {
 
-    fillBackGround();
+    fillBackGround('rgb(0,0,0)');
 
     ctx.font = `${TEXT.FONTSIZE2 + TEXT.FONT}`;
     ctx.fillStyle = 'rgba(255,255,255,0.9)';
@@ -445,7 +445,7 @@ export const TouchAction = {
 export function renderField() {
 
   // background
-  fillBackGround();
+  fillBackGround('rgb(0,0,0)');
 
   // line settings
   ctx.lineWidth = 1;

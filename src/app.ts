@@ -8,16 +8,10 @@ import * as Render from './render';
 import * as Audio from './audio';
 import * as Debug from './dev';
 
-/** 
-  setInterval event
-*/
+// const tabChange = (callback: () => void) => callback();
 
-// let tabChange = false;
-
-// document.addEventListener('visibilitychange', ()=> {
-//   // stop running expensive task
+// document.addEventListener('visibilitychange', () => {
 //   if (document.hidden) {
-//     tabChange = true;
 //   }
 // });
 
@@ -26,10 +20,6 @@ const init = function () {
   // allow user action
   State.Movable.pause = false;
   State.Movable.checkTime = false;
-
-  // if(tabChange) {
-  //   return;
-  // }
 
   let intervalDownMove = downMove();
 

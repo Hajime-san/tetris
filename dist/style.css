@@ -22,8 +22,27 @@ main {
 
 .link {
     position: absolute;
+    display: inline;
     right: 2%;
     bottom: 0;
     color: #fff;
     text-decoration: none;
+    font-size: 13px;
+}
+
+.version {
+    position: absolute;
+    display: inline;
+    left: 2%;
+    bottom: 0;
+    color: #fff;
+    font-size: 13px;
+}
+
+@media screen and (max-width: 420px) {
+    .link,
+    .version {
+        top: -15px;
+        bottom: initial;
+    }
 }

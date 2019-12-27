@@ -42,22 +42,6 @@ export const Update: Update = {
   initField: function () {
     return this.field = [...Array(Data.NUMBER.COLUMN * Data.NUMBER.ROW)]
       .map(v => v = Data.STRING.EMPTY);
-    // return this.field = [
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty','empty','empty','empty','empty','empty',
-    //     'empty','empty','empty','empty','empty',5,'empty','empty','empty','empty',
-    //     0,1,1,'empty','empty','empty',2,1,4,3,
-    //     0,0,1,1,'empty',1,1,1,1,3
-    //   ];
   },
 
   queueField: [],
