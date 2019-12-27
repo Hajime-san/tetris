@@ -1,5 +1,9 @@
-body {
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
     height: 100vh;
     background-color: #000;
     -webkit-tap-highlight-color: transparent;
@@ -11,4 +15,15 @@ main {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+#canvas {
+    position: relative;
+}
+
+.link {
+    position: absolute;
+    right: 2%;
+    bottom: 0;
+    color: #fff;
+    text-decoration: none;
 }

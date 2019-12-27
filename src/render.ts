@@ -499,6 +499,17 @@ export function renderField() {
     (GRID_SIZE.HORIZON + Data.canvas.width - (lineNumberWidth / 2)) / 2,
     (GRID_SIZE.VERTICAL - (GRID_SIZE.QUEUE_STEP * 1)));
 
+  // control description
+  if (!UA.isTouchEnabled()) {
+    ctx.fillText('[↑] Rotate', GRID_SIZE.STEP / 2, GRID_SIZE.VERTICAL + (GRID_SIZE.STEP * 1.5));
+    ctx.fillText('[←] Left', GRID_SIZE.STEP / 2, GRID_SIZE.VERTICAL + (GRID_SIZE.STEP * 2.25));
+    ctx.fillText('[→] Right', GRID_SIZE.STEP / 2, GRID_SIZE.VERTICAL + (GRID_SIZE.STEP * 3));
+    ctx.fillText('[↓] Down', GRID_SIZE.STEP / 2, GRID_SIZE.VERTICAL + (GRID_SIZE.STEP * 3.75));
+
+    ctx.fillText('[Z] Hard Down', GRID_SIZE.HORIZON / 2, GRID_SIZE.VERTICAL + (GRID_SIZE.STEP * 1.5));
+    ctx.fillText('[P] Pause and Restart', GRID_SIZE.HORIZON / 2, GRID_SIZE.VERTICAL + (GRID_SIZE.STEP * 2.25));
+  }
+
 }
 
 export function clearBlock(fieldArray: Data.field) {
@@ -519,15 +530,15 @@ export function clearBlock(fieldArray: Data.field) {
 
 export function renderButton() {
 
-  // line settings
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-
-  ctx.clearRect(0, GRID_SIZE.VERTICAL + GRID_SIZE.STEP, Data.canvas.width, GRID_SIZE.HORIZON);
-
   // touch button
   if (UA.isTouchEnabled()) {
+    // line settings
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+
+    ctx.clearRect(0, GRID_SIZE.VERTICAL + GRID_SIZE.STEP, Data.canvas.width, GRID_SIZE.HORIZON);
+
     TouchAction.left().render();
     TouchAction.right().render();
     TouchAction.down().render();
