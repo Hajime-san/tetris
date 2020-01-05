@@ -110,7 +110,7 @@ const init = function () {
     Render.renderBlock(Controll.Update.field);
     // draw bock queue
     Render.renderQueue(Controll.Update.queueField);
-    Audio.Player.play();
+    //Audio.Player.play();
 
   }
 
